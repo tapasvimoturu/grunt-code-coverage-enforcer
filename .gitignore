@@ -1,0 +1,20 @@
+node_modules/
+bower_components/
+dist/
+build/
+tests/runner/reports/
+html-report/
+#IDE Specific files
+
+#SublimeText
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+
+#IntelliJ
+.idea/
+*.iml
+atlassian-ide-plugin.xml
+
+#Eclipse
+.project
