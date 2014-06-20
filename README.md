@@ -13,7 +13,9 @@ As a result you can work with any tests runners that are capable of generating t
 
 Most other coverage threshold tools fail the build only when you have a test and the test doesn't meet the threshold criteria.  **Most tools will actually pass the build if you dont write any tests for your project**.
 
-This plugin will check and fail if there are files that have not been covered at all.
+**This plugin will check and fail if there are files that have not been covered at all.**
+
+You can always exclude the files that you specifically do not want to test for coverage. Since the policy is opt-out, less files will slip through the cracks ;-)
 
 ----
 
@@ -31,7 +33,9 @@ grunt.loadNpmTasks('grunt-code-coverage-enforcer');
 
 ## The "code-coverage-enforcer" task
 
-## You will need to enable lcov reporter in your test runner.
+## Enabling lcov reporter in your test runner.
+
+You will need to enable lcov reporter in your test runner. The specific config for this may vary for each runner. Please check your specific runner for instructions.
 
 Sample Intern config
 ```js
@@ -175,9 +179,13 @@ You can now simply invoke this from command line using
 ## Contributing
 The project includes jshint and jscs config as part of its dev grunt tasks. Please run grunt lint to ensure that the code passes the code conventions.
 
+Once you have your code ready ready please make a pull request to the author.
+
 ## Release History
 June 19 2014
 Initial Release.
 
 ## License
-Copyright (c) 2014 Intuit. Licensed under the MIT license.
+Copyright (c) 2014 Intuit Inc. 
+
+Licensed under the MIT license.
