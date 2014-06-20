@@ -37,7 +37,7 @@ grunt.loadNpmTasks('grunt-code-coverage-enforcer');
 
 You will need to enable lcov reporter in your test runner. The specific config for this may vary for each runner. Please check your specific runner for instructions.
 
-Sample Intern config
+### Sample Intern config
 ```js
 intern:  {
    runner: {
@@ -49,6 +49,41 @@ intern:  {
     }
   }
 ```
+
+
+
+### Sample Karma config 
+(http://karma-runner.github.io/0.8/config/coverage.html)
+```js
+coverageReporter = {
+  type : 'lcovonly',
+  dir : 'coverage/',
+  file : 'lcov.info'
+}
+```
+
+### Sample Istanbul config 
+(https://github.com/gotwarlost/istanbul, https://www.npmjs.org/package/grunt-istanbul-coverage, https://www.npmjs.org/package/grunt-mocha-istanbul)
+
+Cli version of istanbul has a report parameter that you need to set to lcov or lcovonly. By default it should generate the lcov files.
+Most istanbul plugin allow this to be passed into their grunt config as well.
+
+Here is one suc example for the grunt-mocha-istanbul plugin
+
+```js
+  options: {
+                    reportFormats: ['cobertura','lcovonly']
+          }
+```
+
+### Mocha
+Mocha has an lcov reporter that can be foounf here https://nodejsmodules.org/pkg/mocha-lcov-reporter
+You can also use istanbul with Mocha using the plugin here 
+https://github.com/pocesar/grunt-mocha-istanbul
+
+
+
+
 
 This should typically generate an lcov.info file that will specified as input into the code-coverage-enforcer plugin.
 
