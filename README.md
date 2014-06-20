@@ -117,7 +117,7 @@ Default value: `*`
 The matcher required to compare files within the src location that are to be included
 
 
-#### includes
+#### excludes
 Type: `[matcher]`
 Default value: `[]`
 
