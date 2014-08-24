@@ -59,6 +59,15 @@ module.exports = function(grunt) {
             excludes: []
         }),
 
+        standardizeFilename = function(filename) {
+            if (filename.substring(0, 2) === './') {
+                filename = filename.substring(2);
+            } else if (filename.substring(0, 1) === "/") {
+                filename = filename.substring(1);
+            }
+            return filename;
+        };
+
         /**
          * This function reads the lcov string and converts it into a json object structure similar to the one below
          *
@@ -169,9 +178,7 @@ module.exports = function(grunt) {
             fileList = [],
             isFileExcluded = function(fileList, filename) {
                 var excluded = true;
-                if (filename.substring(0, 1) === "/") {
-                    filename = filename.substring(1);
-                }
+                filename = standardizeFilename(filename);
 
                 fileList.forEach(function(f, index) {
                     if (f === filename) {
@@ -217,9 +224,7 @@ module.exports = function(grunt) {
 
                 var fileName = fileData.file.replace(process.cwd(), "");
 
-                if (fileName.substring(0, 1) === "/") {
-                    fileName = fileName.substring(1);
-                }
+                fileName = standardizeFilename(fileName);
 
                 grunt.log.writeln("File:" + fileName);
                 grunt.log.write("lines:" + lineThreshold + "% | ");
@@ -253,9 +258,7 @@ module.exports = function(grunt) {
                 var representedInLcov = false;
                 data.forEach(function(fileData, index) {
                     var lcov = fileData.file.replace(process.cwd(), "");
-                    if (lcov.substring(0, 1) === "/") {
-                        lcov = lcov.substring(1);
-                    }
+                    lcov = standardizeFilename(lcov);
                     //grunt.verbose.writeln("Comparing filenames:" + lcov +"," + filename);
                     if (lcov === filename) {
                         representedInLcov = true;
@@ -355,9 +358,7 @@ module.exports = function(grunt) {
                 //grunt.verbose.writeln("  checking for match with: " + ip);
                 var file = path.resolve(fp).replace(process.cwd(), "").trim();
 
-                if (file.substring(0, 1) === "/") {
-                    file = file.substring(1);
-                }
+                file = standardizeFilename(file);
 
                 if (minimatch(file, ip, {
                     nocase: true
