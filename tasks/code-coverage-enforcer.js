@@ -59,8 +59,11 @@ module.exports = function(grunt) {
             excludes: []
         }),
 
-        standardizeFilename = function(filename) {
-            if (filename.substring(0, 2) === './') {
+        /* This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter 
+		 * has the filename when it is in the current folder but Karma add as ./ in front of the file
+         */
+		normalizeFilename = function(filename) {
+            if (filename.substring(0, 2) === "./") {
                 filename = filename.substring(2);
             } else if (filename.substring(0, 1) === "/") {
                 filename = filename.substring(1);
@@ -178,7 +181,7 @@ module.exports = function(grunt) {
             fileList = [],
             isFileExcluded = function(fileList, filename) {
                 var excluded = true;
-                filename = standardizeFilename(filename);
+                filename = normalizeFilename(filename);
 
                 fileList.forEach(function(f, index) {
                     if (f === filename) {
@@ -224,7 +227,7 @@ module.exports = function(grunt) {
 
                 var fileName = fileData.file.replace(process.cwd(), "");
 
-                fileName = standardizeFilename(fileName);
+                fileName = normalizeFilename(fileName);
 
                 grunt.log.writeln("File:" + fileName);
                 grunt.log.write("lines:" + lineThreshold + "% | ");
@@ -258,7 +261,7 @@ module.exports = function(grunt) {
                 var representedInLcov = false;
                 data.forEach(function(fileData, index) {
                     var lcov = fileData.file.replace(process.cwd(), "");
-                    lcov = standardizeFilename(lcov);
+                    lcov = normalizeFilename(lcov);
                     //grunt.verbose.writeln("Comparing filenames:" + lcov +"," + filename);
                     if (lcov === filename) {
                         representedInLcov = true;
@@ -358,7 +361,7 @@ module.exports = function(grunt) {
                 //grunt.verbose.writeln("  checking for match with: " + ip);
                 var file = path.resolve(fp).replace(process.cwd(), "").trim();
 
-                file = standardizeFilename(file);
+                file = normalizeFilename(file);
 
                 if (minimatch(file, ip, {
                     nocase: true
