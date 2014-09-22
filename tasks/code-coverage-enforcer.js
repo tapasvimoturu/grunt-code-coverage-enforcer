@@ -51,25 +51,25 @@ module.exports = function(grunt) {
         /* Initializing the default options.
          */
         var options = this.options({
-            lines: 50,
-            functions: 50,
-            branches: 0,
-            includes: ["**/*.js"],
-            src: process.cwd(),
-            excludes: []
-        }),
+                lines: 50,
+                functions: 50,
+                branches: 0,
+                includes: ["**/*.js"],
+                src: process.cwd(),
+                excludes: []
+            }),
 
-        /* This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter 
-		 * has the filename when it is in the current folder but Karma add as ./ in front of the file
-         */
-		normalizeFilename = function(filename) {
-            if (filename.substring(0, 2) === "./") {
-                filename = filename.substring(2);
-            } else if (filename.substring(0, 1) === "/") {
-                filename = filename.substring(1);
-            }
-            return filename;
-        };
+            /* This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter
+             * has the filename when it is in the current folder but Karma add as ./ in front of the file
+             */
+            normalizeFilename = function(filename) {
+                if (filename.substring(0, 2) === "./") {
+                    filename = filename.substring(2);
+                } else if (filename.substring(0, 1) === "/") {
+                    filename = filename.substring(1);
+                }
+                return filename;
+            };
 
         /**
          * This function reads the lcov string and converts it into a json object structure similar to the one below
@@ -103,6 +103,7 @@ module.exports = function(grunt) {
                 switch (parts[0].toUpperCase()) {
                     case "SF":
                         item.file = parts.slice(1).join(":").trim();
+                        item.file = normalizeOSPath(item.file);
                         break;
                     case "FNF":
                         item.functions.found = Number(parts[1].trim());
@@ -150,7 +151,7 @@ module.exports = function(grunt) {
                     callback(lcovData);
                 }
             });
-        },
+        };
 
         /**
          * This function is going to read the specified file synchronously and then call the provided callback with the string content.
@@ -167,7 +168,7 @@ module.exports = function(grunt) {
             } else {
                 grunt.fail.warn("Could not read from lcov file. Please ensure that that file exists");
             }
-        },
+        };
 
         /**
          * This function checks if the
@@ -177,21 +178,21 @@ module.exports = function(grunt) {
         checkThresholdValidity = function(data) {
             //grunt.verbose.writeln("Processing LcovData:" + data);
             var pass = true,
-            length = data.length,
-            fileList = [],
-            isFileExcluded = function(fileList, filename) {
-                var excluded = true;
-                filename = normalizeFilename(filename);
+                length = data.length,
+                fileList = [],
+                isFileExcluded = function(fileList, filename) {
+                    var excluded = true;
+                    filename = normalizeFilename(filename);
 
-                fileList.forEach(function(f, index) {
-                    if (f === filename) {
-                        excluded = false;
-                    }
+                    fileList.forEach(function(f, index) {
+                        if (f === filename) {
+                            excluded = false;
+                        }
 
-                });
-                //grunt.verbose.writeln("Checking if file is excluded: " + filename + "excluded:" + excluded);
-                return excluded;
-            };
+                    });
+                    //grunt.verbose.writeln("Checking if file is excluded: " + filename + "excluded:" + excluded);
+                    return excluded;
+                };
 
             grunt.log.writeln("------------------------------------------------------------------");
             grunt.log.writeln("Scanning folder for files");
@@ -277,7 +278,7 @@ module.exports = function(grunt) {
                 grunt.fail.warn("Failed to meet code coverage threshold requirements");
             }
 
-        },
+        };
 
         /**
          * Gathers all files that need to be checked for threshold validity.
@@ -285,14 +286,16 @@ module.exports = function(grunt) {
          *
          */
         gather = function(opts) {
-            var files = [],excludes = options.exclude,includes = options.src;
+            var files = [],
+                excludes = options.exclude,
+                includes = options.src;
 
             opts.args.forEach(function(target) {
                 collect(target, files, includes, excludes);
             });
 
             return files;
-        },
+        };
 
         /**
          * Recursively gather all files that need to be processed,
@@ -345,7 +348,7 @@ module.exports = function(grunt) {
 
                 return;
             }
-        },
+        };
 
         /**
          * Checks whether a file matches the list of patterns specified.
@@ -385,8 +388,39 @@ module.exports = function(grunt) {
             });
         };
 
+        //normalizing all path properties.
+        normalizeOSPath = function(fp) {
+            var arr = [],
+                normalizeFile = function(f) {
+                    if (path.sep === "\\") {
+                        //Current Machine is windows style
+                        f = f.replace(/\//g, "\\");
+                    } else {
+                        //Current Machine is unix style
+                        f = f.replace(/\\/g, "/");
+
+                    }
+                    return f;
+                };
+
+            if (fp instanceof Array) {
+                fp.forEach(function(file) {
+                    arr.push(normalizeFile(file));
+                });
+                return arr;
+            } else {
+                return normalizeFile(fp);
+
+            }
+        };
+
         grunt.verbose.writeln("Checking code coverage for threshold limits ....");
         grunt.verbose.writeln("Reading the lcov file ....");
+
+        options.lcovfile = normalizeOSPath(options.lcovfile);
+        options.includes = normalizeOSPath(options.includes);
+        options.excludes = normalizeOSPath(options.excludes);
+        options.src = normalizeOSPath(options.src);
 
         if (options.lcovfile) {
             grunt.verbose.writeln("Processing File:" + options.lcovfile);

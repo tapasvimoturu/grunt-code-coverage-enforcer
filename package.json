@@ -1,6 +1,6 @@
 {
   "name": "grunt-code-coverage-enforcer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Enforces code coverage thresholds for a project with lcov files.",
   "homepage": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer",
   "author": {
