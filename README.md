@@ -93,7 +93,7 @@ In your project's Gruntfile, add a section named `code-coverage-enforcer` to the
 
 ```js
 grunt.initConfig({
-  code-coverage-enforcer: {
+  "code-coverage-enforcer": {
     options: {
         lcovfile: "lcov.info",
         lines: 60,
@@ -168,7 +168,7 @@ In this example, the default options are used
 
 ```js
 grunt.initConfig({
-  code-coverage-enforcer: {
+  "code-coverage-enforcer": {
     options: {
         lcovfile: "lcov.info",
         includes: ["src/**/*.js"],
@@ -182,7 +182,7 @@ grunt.initConfig({
 In this example, custom options are used to specify the threshold limits
 ```js
 grunt.initConfig({
-  code-coverage-enforcer: {
+  "code-coverage-enforcer": {
     options: {
         lcovfile: "lcov.info",
         lines: 60,
