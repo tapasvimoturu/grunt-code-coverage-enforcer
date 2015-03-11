@@ -5,10 +5,10 @@ module.exports = function(grunt) {
         banner;
 
     banner = "/*! <%= pkg.name %> - v<%= pkg.version %> - " +
-            "<%= grunt.template.today('yyyy-mm-dd') %>\n" +
-            "<%= pkg.homepage ? '* ' + pkg.homepage + '\\n' : '' %>" +
-            "* Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" +
-            " Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n";
+        "<%= grunt.template.today('yyyy-mm-dd') %>\n" +
+        "<%= pkg.homepage ? '* ' + pkg.homepage + '\\n' : '' %>" +
+        "* Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" +
+        " Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n";
 
     require("time-grunt")(grunt);
     //Load our custom tasks
@@ -23,11 +23,20 @@ module.exports = function(grunt) {
             devServerPort: 9998
         },
         loadGruntTasks: { //can optionally pass options to load-grunt-tasks.  If you set to false, it will disable auto loading tasks.
-            pattern:  ["grunt-*", "intern"]
+            pattern: ["grunt-*", "intern"]
         }
     });
+
+    grunt.initConfig({
+        nodeunit: {
+            all: ["test/*-test.js"],
+            options: {
+                reporter: 'verbose'
+            }
+        },
+    });
     // Actually load this plugin's task(s).
-    grunt.loadTasks('tasks');
+    grunt.loadTasks("tasks");
 
     //Linting tasks
     grunt.registerTask("lint", ["jshint", "jscs"]);
@@ -36,5 +45,7 @@ module.exports = function(grunt) {
     grunt.registerTask("documentation", ["jsdoc"]);
 
     // Default task.
-    grunt.registerTask("default", ["clean:build", "lint", "documentation"]);
+    grunt.registerTask("default", [/*"clean:build"*/, "lint", "documentation"]);
+
+    grunt.registerTask("test", ["nodeunit"]);
 };
