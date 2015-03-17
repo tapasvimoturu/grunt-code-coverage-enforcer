@@ -198,7 +198,7 @@ grunt.initConfig({
 })
 ```
 
-With 0.2.0 release you will be able to customize the code-coverage on and individual folder level.  The configuration options to provide code-coverage on an individual folder can be specified in the following way:
+With the release of version 0.2.0,  you will be able to customize the code-coverage on and individual folder/package level.  The configuration options on an individual folder/package level can be specified in the following way:
 
 ```js
 grunt.initConfig({
@@ -208,19 +208,34 @@ grunt.initConfig({
         lines: 60, //Global line coverage configuration
         functions: 60, // Global function coverage configuration
         branches: 60, // Global branch coverage configuration
-        src: [{path:"middleware", lines:90}, {path:"backend", lines: 90, functions: 80}, {path:"frontend", lines: 90, functions: 80, branches:70, includes:["**.js"], excludes:["frontend/exclude.js"]}
+        src: [{
+          path:"middleware", 
+          lines:90
+        }, {
+          path:"backend", 
+          lines: 90, 
+          functions: 80
+        }, {
+          path:"frontend", 
+          lines: 90, 
+          functions: 80,
+          branches:70, 
+          includes:["**.js"], 
+          excludes:["frontend/exclude.js"]
+        }
         includes: ["src/**/*.js"],
         excludes: ["src/uncoveredfile.js"]
     }
   },
 })
 ```
-If any configuration option is not provided on an individual folder level, the default configurations are chosen.  In the above example we configured our project to have the following three coverage configuration
+In the above example we configured our project to have the following three coverage configuration
 
 1.  90% line coverage, 60% function coverage, 60% branch coverage for all the files in middleware folder.
 2.  90% line coverage, 80% function coverage, 60% branch coverage for all the files in backend folder.
 3.  90% line coverage, 80% function coverage, 70% branch coverage for all the files in frontend folder except exclude.js file.
 
+If any of the configuration option is not provided for a given folder/package, the default configurations are chosen.
 
 ### Recommendations
 
