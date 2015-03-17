@@ -488,7 +488,7 @@ module.exports = (function() {
             configs = src;
             configs.forEach(function(conf) {
 
-                if(!config.lines) {
+                if(!conf.lines) {
                     conf.lines = lines;
                 }
 
