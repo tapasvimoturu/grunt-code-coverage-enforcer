@@ -119,6 +119,8 @@ the default threshold values are
         }
 ```
 
+You can also provide multiple configurations for different features/packages of your project.
+
 ### Options
 
 #### lines
@@ -195,6 +197,29 @@ grunt.initConfig({
   },
 })
 ```
+
+With 0.2.0 release you will be able to customize the code-coverage on and individual folder level.  The configuration options to provide code-coverage on an individual folder can be specified in the following way:
+
+```js
+grunt.initConfig({
+  "code-coverage-enforcer": {
+    options: {
+        lcovfile: "lcov.info",
+        lines: 60, //Global line coverage configuration
+        functions: 60, // Global function coverage configuration
+        branches: 60, // Global branch coverage configuration
+        src: [{path:"middleware", lines:90}, {path:"backend", lines: 90, functions: 80}, {path:"frontend", lines: 90, functions: 80, branches:70, includes:["**.js"], excludes:["frontend/exclude.js"]}
+        includes: ["src/**/*.js"],
+        excludes: ["src/uncoveredfile.js"]
+    }
+  },
+})
+```
+If any configuration option is not provided on an individual folder level, the default configurations are chosen.  In the above example we configured our project to have the following three coverage configuration
+
+1.  90% line coverage, 60% function coverage, 60% branch coverage for all the files in middleware folder.
+2.  90% line coverage, 80% function coverage, 60% branch coverage for all the files in backend folder.
+3.  90% line coverage, 80% function coverage, 70% branch coverage for all the files in frontend folder except exclude.js file.
 
 
 ### Recommendations
