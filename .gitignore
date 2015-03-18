@@ -4,6 +4,10 @@ dist/
 build/
 tests/runner/reports/
 html-report/
+
+#npm pack files
+*.tgz
+
 #IDE Specific files
 
 #SublimeText

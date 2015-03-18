@@ -358,7 +358,22 @@ module.exports = (function() {
                 });
                 //grunt.verbose.writeln("Checking if file is excluded: " + filename + "excluded:" + excluded);
                 return excluded;
+            },
+            isFileInPath = function(src, filename) {
+                var included = false,
+                normalizedSrc = exports.normalizeFileName(src);
+                filename = exports.normalizeFileName(filename);
+                if(filename.indexOf(normalizedSrc) !== -1){
+                    included = true;
+                }
+
+                //grunt.verbose.writeln("Checking if file is excluded: " + filename + "excluded:" + excluded);
+                return included;
             };
+        grunt.log.writeln("------------------------------------------------------------------");
+        grunt.log.writeln("Running threshold checks for the following path config:" + config.path);
+        grunt.verbose.writeln("Current config:" + JSON.stringify(config));
+        grunt.log.writeln("------------------------------------------------------------------");
         grunt.log.writeln("------------------------------------------------------------------");
         grunt.log.writeln("Scanning folder for files");
         grunt.log.writeln("------------------------------------------------------------------");
@@ -394,22 +409,30 @@ module.exports = (function() {
             var fileName = fileData.file.replace(process.cwd(), "");
 
             fileName = exports.normalizeFileName(fileName);
+            var included = isFileInPath(src, fileName);
+            if(included) {
+                grunt.log.writeln("File:" + fileName);
+                grunt.log.write("lines:" + lineThreshold + "% | ");
+                grunt.log.write("functions:" + functionThreshold + "% | ");
+                grunt.log.write("branches:" + branchesThreshold + "% | ");
+                var excluded = isFileExcluded(fileList, fileName);
 
-            grunt.log.writeln("File:" + fileName);
-            grunt.log.write("lines:" + lineThreshold + "% | ");
-            grunt.log.write("functions:" + functionThreshold + "% | ");
-            grunt.log.write("branches:" + branchesThreshold + "% | ");
-            var excluded = isFileExcluded(fileList, fileName);
-
-            if(!excluded) {
-                if (lineThreshold >= lines && functionThreshold >= functions && branchesThreshold >= branches) {
-                    grunt.log.ok();
+                if(!excluded) {
+                    if (lineThreshold >= lines && functionThreshold >= functions && branchesThreshold >= branches) {
+                        grunt.log.ok();
+                    } else {
+                        grunt.log.error();
+                        pass = false;
+                    }
                 } else {
-                    grunt.log.error();
-                    pass = false;
+                    grunt.log.ok("EXCLUDED");
                 }
             } else {
-                grunt.log.ok("EXCLUDED");
+                grunt.verbose.writeln("File:" + fileName);
+                grunt.verbose.write("lines:" + lineThreshold + "% | ");
+                grunt.verbose.write("functions:" + functionThreshold + "% | ");
+                grunt.verbose.write("branches:" + branchesThreshold + "% | ");
+                grunt.verbose.writeln("SKIPPED");
             }
         });
 
@@ -504,7 +527,7 @@ module.exports = (function() {
                     conf.includes = includes;
                 }
 
-                if(!config.excludes) {
+                if(!conf.excludes) {
                     conf.excludes = excludes;
                 }
             });

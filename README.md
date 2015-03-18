@@ -257,6 +257,9 @@ The project includes jshint and jscs config as part of its dev grunt tasks. Plea
 Once you have your code ready ready please make a pull request to the author.
 
 ## Release History
+March 17 2-15
+0.2.0: Threshold configuration now supports per folder configuration in addition to one config for all.
+
 June 19 2014
 Initial Release.
 
