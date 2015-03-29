@@ -178,43 +178,7 @@ module.exports = (function() {
 
         }
     };
-    /**
-     * Checks whether a file matches the list of patterns specified.
-     *
-     * @param {string} fp       a path to a file
-     * @param {array}  patterns a list of patterns for files  matching
-     *
-     * @return {boolean} "true" if file matches, "false" if file doesnt match.
-     */
-    exports.isMatched = function(fp, patterns) {
-        //grunt.verbose.writeln("Matching file:" + fp +" with pattern:" + patterns);
-        return patterns.some(function(ip) {
-            //grunt.verbose.writeln("  checking for match with: " + ip);
-            var file = path.resolve(fp).replace(process.cwd(), "").trim();
-
-            file = exports.normalizeFileName(file);
-
-            if (minimatch(file, ip, {
-                    nocase: true
-                })) {
-                //grunt.verbose.writeln(file + ", Matched::file with regular expression");
-                return true;
-            }
-
-            if (file === ip) {
-                //grunt.verbose.writeln(fp + ", Matched::file exactly");
-                return true;
-            }
-
-            if (shjs.test("-d", fp) && ip.match(/^[^\/]*\/?$/) &&
-                file.match(new RegExp("^" + ip))) {
-                //grunt.verbose.writeln(fp+ ", Matched::regular expression:" + "^" + ip + "*" );
-                return true;
-            }
-            //grunt.verbose.writeln(fp + ", Did not Match");
-            return false;
-        });
-    };
+    
 
     /**
      * Gathers all files that need to be checked for threshold validity.
@@ -249,7 +213,7 @@ module.exports = (function() {
         //grunt.verbose.writeln("  testing for excludes");
 
         if (excludes && exports.isMatched(fp, excludes)) {
-            grunt.log.writeln("Exluded: " + fp);
+            grunt.log.writeln("Excluded: " + fp);
             return;
         }
 

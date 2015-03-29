@@ -66,6 +66,27 @@ module.exports = (function(grunt) {
         test.done();
     };
 
+    exports.testNormalizeSrcToObjBaseCase = function(test) {
+        test.expect(1);
+        var src = process.cwd(),
+            functions = 20,
+            branches = 20,
+            lines = 20,
+            includes = ["/**.js", "/**.js"],
+            excludes = ["/**.js", "/**.js"],
+            returnValue, testValue = [{
+                path: process.cwd().substring(1),
+                lines : 20,
+                functions : 20,
+                branches : 20,
+                includes : ["/**.js", "/**.js"],
+                excludes : ["/**.js", "/**.js"]
+            }];
+        returnValue = util.normalizeSrcToObj(src, lines, functions, branches, includes, excludes);
+        test.strictEqual(JSON.stringify(returnValue), JSON.stringify(testValue), "The base case works");
+        test.done();
+    };
+
     exports.testCheckThresholdValidity = function(test) {
         // test.expect(1);
 
@@ -102,48 +123,6 @@ module.exports = (function(grunt) {
 
 
         util.checkThresholdValidity(item, options);
-        test.done();
-    };
-
-    exports.testNormalizeSrcToObjBaseCase = function(test) {
-        test.expect(1);
-        var src = process.cwd(),
-            functions = 20,
-            branches = 20,
-            lines = 20,
-            includes = ["/**.js", "/**.js"],
-            excludes = ["/**.js", "/**.js"],
-            returnValue, testValue = [{
-                path: process.cwd().substring(1),
-                lines : 20,
-                functions : 20,
-                branches : 20,
-                includes : ["/**.js", "/**.js"],
-                excludes : ["/**.js", "/**.js"]
-            }];
-        returnValue = util.normalizeSrcToObj(src, lines, functions, branches, includes, excludes);
-        test.strictEqual(JSON.stringify(returnValue), JSON.stringify(testValue), "The base case works");
-        test.done();
-    };
-
-    exports.testNormalizeSrcToObjBaseCase = function(test) {
-        test.expect(1);
-        var src = process.cwd(),
-            functions = 20,
-            branches = 20,
-            lines = 20,
-            includes = ["/**.js", "/**.js"],
-            excludes = ["/**.js", "/**.js"],
-            returnValue, testValue = [{
-                path: process.cwd().substring(1),
-                lines : 20,
-                functions : 20,
-                branches : 20,
-                includes : ["/**.js", "/**.js"],
-                excludes : ["/**.js", "/**.js"]
-            }];
-        returnValue = util.normalizeSrcToObj(src, lines, functions, branches, includes, excludes);
-        test.strictEqual(JSON.stringify(returnValue), JSON.stringify(testValue), "The base case works");
         test.done();
     };
 
