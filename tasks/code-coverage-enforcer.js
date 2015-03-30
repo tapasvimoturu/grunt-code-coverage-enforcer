@@ -78,7 +78,7 @@ module.exports = function(grunt) {
             //Read the lcov file and pass the contents of the file to the anonymous function.
             util.readFile(options.lcovfile, function(content) {
                 //parse the lcov content and pass the json representation of the data to the anonymous function.
-                util.parseLcovContent(content, function(lcovJson) {
+                util.parseLcovContent(content, process.cwd(), function(lcovJson) {
                     //Check the threshold validity using the lcovJson with all the passed in configs
                     util.checkThresholdValidity(lcovJson, options.src);
                 });

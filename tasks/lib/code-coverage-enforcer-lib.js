@@ -62,7 +62,7 @@ module.exports = (function() {
      */
     exports.readFile = function(file, callback) {
         grunt.verbose.writeln("Checking if file exists ... " + file);
-        var content = fs.readFileSync(exports.normalizeFileName(file), "utf8");
+        var content = fs.readFileSync(file, "utf8");
         if (content) {
             grunt.verbose.ok();
             callback(content);
@@ -75,9 +75,9 @@ module.exports = (function() {
      * This function reads the lcov string and converts it into a json object structure similar to the one below
      *
      */
-    exports.parseLcovContent = function(lcovRawString, callback) {
+    exports.parseLcovContent = function(lcovRawString, workingDirectory, callback) {
         //grunt.verbose.writeln("lcov content" + lcovRawString);
-        var lcovData = [],
+        var lcovData = {},
             item = {
                 file: undefined,
                 lines: {
@@ -126,7 +126,10 @@ module.exports = (function() {
             }
 
             if (entry.indexOf("end_of_record") > -1) {
-                lcovData.push(item);
+                item.file = exports.normalizeFileName(item.file.replace(workingDirectory, ""));
+
+                lcovData[item.file] = item;
+                //lcovData.push(item);
                 // Resetting item to a new Json object after pushing.
                 item = {
                     file: undefined,
@@ -178,7 +181,7 @@ module.exports = (function() {
 
         }
     };
-    
+
 
     /**
      * Gathers all files that need to be checked for threshold validity.
@@ -208,11 +211,11 @@ module.exports = (function() {
      *
      * collect(options.src, fileList, options.includes, options.excludes, null);
      */
-    exports.collect = function(fp, files, includes, excludes) {
+    exports.collect = function(fp, files, includes, excludes, replaceDirectory) {
         //grunt.verbose.writeln("trying to collect: " + fp +",filesLength:" + files.length +",includes:" + includes + ",excludes:"+excludes);
         //grunt.verbose.writeln("  testing for excludes");
 
-        if (excludes && exports.isMatched(fp, excludes)) {
+        if (excludes && exports.isMatched(fp, replaceDirectory, excludes)) {
             grunt.log.writeln("Excluded: " + fp);
             return;
         }
@@ -225,7 +228,7 @@ module.exports = (function() {
 
         if (shjs.test("-f", fp) || shjs.test("-L", fp)) {
 
-            if (exports.isMatched(fp, includes)) {
+            if (exports.isMatched(fp, replaceDirectory, includes)) {
                 // /grunt.verbose.writeln("pushing file 1:" + fp);
                 files.push(fp);
             }
@@ -240,9 +243,9 @@ module.exports = (function() {
 
                 var itempath = path.join(fp, item);
                 if (shjs.test("-d", itempath)) {
-                    exports.collect(itempath, files, includes, excludes);
+                    exports.collect(itempath, files, includes, excludes, replaceDirectory);
                 } else {
-                    exports.collect(itempath, files, includes, excludes);
+                    exports.collect(itempath, files, includes, excludes, replaceDirectory);
                     return;
                 }
             });
@@ -259,11 +262,11 @@ module.exports = (function() {
      *
      * @return {boolean} "true" if file matches, "false" if file doesnt match.
      */
-    exports.isMatched = function(fp, patterns) {
+    exports.isMatched = function(fp, replaceDirectory, patterns) {
         //grunt.verbose.writeln("Matching file:" + fp +" with pattern:" + patterns);
         return patterns.some(function(ip) {
             //grunt.verbose.writeln("  checking for match with: " + ip);
-            var file = path.resolve(fp).replace(process.cwd(), "").trim();
+            var file = path.resolve(fp).replace(replaceDirectory, "").trim();
 
             file = exports.normalizeFileName(file);
 
@@ -297,7 +300,7 @@ module.exports = (function() {
      * @param  {config} data  Config for checking validity check for a specific folder.  See
      * @return {none}
      */
-    exports.checkThresholdValidityForConfig = function(data, config) {
+    exports.checkThresholdValidityForConfig = function(data, config, homeDirectory) {
         var src = config.path,
             lines = config.lines,
             functions = config.functions,
@@ -315,8 +318,8 @@ module.exports = (function() {
                         excluded = false;
                     }
 
-                    f = exports.normalizeFileName(f.replace(process.cwd(),""));
-                    if(f === filename) {
+                    f = exports.normalizeFileName(f.replace(process.cwd(), ""));
+                    if (f === filename) {
                         excluded = false;
                     }
                 });
@@ -325,9 +328,9 @@ module.exports = (function() {
             },
             isFileInPath = function(src, filename) {
                 var included = false,
-                normalizedSrc = exports.normalizeFileName(src);
+                    normalizedSrc = exports.normalizeFileName(src);
                 filename = exports.normalizeFileName(filename);
-                if(filename.indexOf(normalizedSrc) !== -1){
+                if (filename.indexOf(normalizedSrc) !== -1) {
                     included = true;
                 }
 
@@ -342,7 +345,7 @@ module.exports = (function() {
         grunt.log.writeln("Scanning folder for files");
         grunt.log.writeln("------------------------------------------------------------------");
 
-        exports.collect(src, fileList, includes, excludes, null);
+        exports.collect(src, fileList, includes, excludes, homeDirectory);
 
         fileList.forEach(function(filename, index) {
             grunt.verbose.writeln("Included:" + filename);
@@ -351,75 +354,119 @@ module.exports = (function() {
         grunt.log.writeln("Threshold configuration: lines:" + lines + "%, functions:" + functions + "%, branches:" + branches + "%");
         grunt.log.writeln("------------------------------------------------------------------");
 
-        data.forEach(function(fileData, index) {
-            var lineThreshold = 100,
-                functionThreshold = 100,
-                branchesThreshold = 100;
-            if (fileData.lines.hit > 0) {
-                lineThreshold = fileData.lines.hit * 100 / fileData.lines.found;
-                lineThreshold = parseFloat(lineThreshold.toFixed(2));
-            }
-
-            if (fileData.functions.hit > 0) {
-                functionThreshold = fileData.functions.hit * 100 / fileData.functions.found;
-                functionThreshold = parseFloat(functionThreshold.toFixed(2));
-            }
-
-            if (fileData.branches.hit > 0) {
-                branchesThreshold = fileData.branches.hit * 100 / fileData.branches.found;
-                branchesThreshold = parseFloat(branchesThreshold.toFixed(2));
-            }
-
-            var fileName = fileData.file.replace(process.cwd(), "");
-
-            fileName = exports.normalizeFileName(fileName);
-            var included = isFileInPath(src, fileName);
-            if(included) {
-                grunt.log.writeln("File:" + fileName);
-                grunt.log.write("lines:" + lineThreshold + "% | ");
-                grunt.log.write("functions:" + functionThreshold + "% | ");
-                grunt.log.write("branches:" + branchesThreshold + "% | ");
-                var excluded = isFileExcluded(fileList, fileName);
-
-                if(!excluded) {
-                    if (lineThreshold >= lines && functionThreshold >= functions && branchesThreshold >= branches) {
-                        grunt.log.ok();
-                    } else {
-                        grunt.log.error();
-                        pass = false;
-                    }
-                } else {
-                    grunt.log.ok("EXCLUDED");
-                }
-            } else {
-                grunt.verbose.writeln("File:" + fileName);
-                grunt.verbose.write("lines:" + lineThreshold + "% | ");
-                grunt.verbose.write("functions:" + functionThreshold + "% | ");
-                grunt.verbose.write("branches:" + branchesThreshold + "% | ");
-                grunt.verbose.writeln("SKIPPED");
-            }
-        });
-
         fileList.forEach(function(filename, index) {
-            var representedInLcov = false;
-            data.forEach(function(fileData, index) {
-                var lcov = fileData.file.replace(process.cwd(), "");
-                lcov = exports.normalizeFileName(lcov);
-                //grunt.verbose.writeln("Comparing filenames:" + lcov +"," + filename);
-                var normalizedFileName = exports.normalizeFileName(filename.replace(process.cwd(),""));
-                if (lcov === normalizedFileName) {
-                    representedInLcov = true;
+            var fName = exports.normalizeFileName(filename.replace(homeDirectory, ""));
+            var fileData = data[fName];
+
+            if (fileData) {
+                var lineThreshold = 100,
+                    functionThreshold = 100,
+                    branchesThreshold = 100;
+                if (fileData.lines.hit > 0) {
+                    lineThreshold = fileData.lines.hit * 100 / fileData.lines.found;
+                    lineThreshold = parseFloat(lineThreshold.toFixed(2));
                 }
-            });
-            if (representedInLcov === false) {
+
+                if (fileData.functions.hit > 0) {
+                    functionThreshold = fileData.functions.hit * 100 / fileData.functions.found;
+                    functionThreshold = parseFloat(functionThreshold.toFixed(2));
+                }
+
+                if (fileData.branches.hit > 0) {
+                    branchesThreshold = fileData.branches.hit * 100 / fileData.branches.found;
+                    branchesThreshold = parseFloat(branchesThreshold.toFixed(2));
+                }
+
+                if(lineThreshold>=config.lines && branchesThreshold>=config.branches && functionThreshold>=config.functions) {
+                    grunt.verbose.writeln("The file:" + filename + " passed the code coverage.")
+                    grunt.log.ok();
+                } else {
+                    grunt.verbose.writeln("The file:" + filename + " with coverage threshold, linesThreshold: " + lineThreshold + ", branchesThreshold: " + branchesThreshold + ", functionThreshold: " + functionThreshold + " does not have the appropriate code coverage.")
+                    grunt.log.error();
+                    pass = false;
+                }
+            } else if(config.lines===0 && config.functions===0 && config.branches===0) {
+                grunt.verbose.writeln("Skipping file: " + filename + " as the threshold is set to 0.")
+            } else {
                 grunt.log.error("FAILED file:" + filename + " :: Has no code coverage data. Ensure that the source file is represented in test coverage (lcov) data");
-                pass = false;
+                pass = false; 
             }
         });
 
         if (pass === false) {
             grunt.fail.warn("Failed to meet code coverage threshold requirements");
         }
+
+
+        // data.forEach(function(fileData, index) {
+        //     var lineThreshold = 100,
+        //         functionThreshold = 100,
+        //         branchesThreshold = 100;
+        //     if (fileData.lines.hit > 0) {
+        //         lineThreshold = fileData.lines.hit * 100 / fileData.lines.found;
+        //         lineThreshold = parseFloat(lineThreshold.toFixed(2));
+        //     }
+
+        //     if (fileData.functions.hit > 0) {
+        //         functionThreshold = fileData.functions.hit * 100 / fileData.functions.found;
+        //         functionThreshold = parseFloat(functionThreshold.toFixed(2));
+        //     }
+
+        //     if (fileData.branches.hit > 0) {
+        //         branchesThreshold = fileData.branches.hit * 100 / fileData.branches.found;
+        //         branchesThreshold = parseFloat(branchesThreshold.toFixed(2));
+        //     }
+
+        //     var fileName = fileData.file.replace(process.cwd(), "");
+
+        //     fileName = exports.normalizeFileName(fileName);
+        //     var included = isFileInPath(src, fileName);
+        //     if(included) {
+        //         grunt.log.writeln("File:" + fileName);
+        //         grunt.log.write("lines:" + lineThreshold + "% | ");
+        //         grunt.log.write("functions:" + functionThreshold + "% | ");
+        //         grunt.log.write("branches:" + branchesThreshold + "% | ");
+        //         var excluded = isFileExcluded(fileList, fileName);
+
+        //         if(!excluded) {
+        //             if (lineThreshold >= lines && functionThreshold >= functions && branchesThreshold >= branches) {
+        //                 grunt.log.ok();
+        //             } else {
+        //                 grunt.log.error();
+        //                 pass = false;
+        //             }
+        //         } else {
+        //             grunt.log.ok("EXCLUDED");
+        //         }
+        //     } else {
+        //         grunt.verbose.writeln("File:" + fileName);
+        //         grunt.verbose.write("lines:" + lineThreshold + "% | ");
+        //         grunt.verbose.write("functions:" + functionThreshold + "% | ");
+        //         grunt.verbose.write("branches:" + branchesThreshold + "% | ");
+        //         grunt.verbose.writeln("SKIPPED");
+        //     }
+        // });
+
+        // fileList.forEach(function(filename, index) {
+        //     var representedInLcov = false;
+        //     data.forEach(function(fileData, index) {
+        //         var lcov = fileData.file.replace(process.cwd(), "");
+        //         lcov = exports.normalizeFileName(lcov);
+        //         //grunt.verbose.writeln("Comparing filenames:" + lcov +"," + filename);
+        //         var normalizedFileName = exports.normalizeFileName(filename.replace(process.cwd(),""));
+        //         if (lcov === normalizedFileName) {
+        //             representedInLcov = true;
+        //         }
+        //     });
+        //     if (representedInLcov === false) {
+        //         grunt.log.error("FAILED file:" + filename + " :: Has no code coverage data. Ensure that the source file is represented in test coverage (lcov) data");
+        //         pass = false;
+        //     }
+        // });
+
+        // if (pass === false) {
+        //     grunt.fail.warn("Failed to meet code coverage threshold requirements");
+        // }
     };
 
     /**
@@ -430,10 +477,10 @@ module.exports = (function() {
      * @param  {Array} data  An array that contains the individual configurations for threshold validity check.  See
      * @return {none}
      */
-    exports.checkThresholdValidity = function(data, configs) {
+    exports.checkThresholdValidity = function(data, configs, homeDirectory) {
         //grunt.verbose.writeln("Processing LcovData:" + data);
         configs.forEach(function(config) {
-            exports.checkThresholdValidityForConfig(data, config);
+            exports.checkThresholdValidityForConfig(data, config, homeDirectory);
         });
     };
 
@@ -462,8 +509,9 @@ module.exports = (function() {
     * for eg. normalizeSrcToObj("./src", 20, 20, 20,["*.js"],["abc.js"]) => [{src:"src",lines:20,functions:20,branches:20, includes:["*.js"], excludes:["abc.js"]}]
     */
     exports.normalizeSrcToObj = function(src, lines, functions, branches, includes, excludes) {
-        var configs = [], config ={};
-        if(typeof(src)==="string") {
+        var configs = [],
+            config = {};
+        if (typeof(src) === "string") {
             config.path = src;
             config.lines = lines;
             config.functions = functions;
@@ -471,27 +519,27 @@ module.exports = (function() {
             config.includes = includes;
             config.excludes = excludes;
             configs.push(config);
-        } else if(Array.isArray(src)) {//typeof is of array... or has push method
+        } else if (Array.isArray(src)) { //typeof is of array... or has push method
             configs = src;
             configs.forEach(function(conf) {
 
-                if(!conf.lines) {
+                if (!conf.lines) {
                     conf.lines = lines;
                 }
 
-                if(!conf.functions) {
+                if (!conf.functions) {
                     conf.functions = functions;
                 }
 
-                if(!conf.branches) {
+                if (!conf.branches) {
                     conf.branches = branches;
                 }
 
-                if(!conf.includes) {
+                if (!conf.includes) {
                     conf.includes = includes;
                 }
 
-                if(!conf.excludes) {
+                if (!conf.excludes) {
                     conf.excludes = excludes;
                 }
             });
