@@ -101,7 +101,7 @@ module.exports = function(grunt) {
                     grunt.log.ok(options.passMessage);
                 }
                 done();
-            });
+           });
         } else {
             grunt.fail.warn("No lcov file information passed in the configurations.");
         }
