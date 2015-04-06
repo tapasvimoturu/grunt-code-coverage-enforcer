@@ -73,6 +73,40 @@ module.exports = (function(grunt) {
         test.done();
     };
 
+    exports.testConsoleLog = function(test) {
+        debugger;
+        test.expect(1);
+        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
+            config = [{
+                path: "/Users/hsomani/githubProjects/zionjs/lib",
+                lines: 100,
+                functions: 100,
+                branches: 100,
+                includes: ["lib/**.js"]
+            },{
+                path: "/Users/hsomani/githubProjects/zionjs/middleware",
+                lines: 100,
+                functions: 100,
+                branches: 100,
+                includes: ["middleware/**.js"],
+                excludes: ["middleware/errorCatcher.js"]
+            },{
+                path: "/Users/hsomani/githubProjects/zionjs/node_modules",
+                lines: 100,
+                functions: 100,
+                branches: 100,
+                includes: ["**/**.js"]
+            }],
+            homeDirectory = "/Users/hsomani/githubProjects/zionjs";
+        util.readFile(filename, function(content) {
+            util.parseLcovContent(content, homeDirectory, function(data) {
+                util.checkThresholdValidity(data, config, homeDirectory);
+                test.equal("happy", "happy", "The coverage is not the same");
+            });
+        });
+        test.done();
+    };
+
     exports.testNormalizeFileName = function(test) {
         test.expect(3);
 

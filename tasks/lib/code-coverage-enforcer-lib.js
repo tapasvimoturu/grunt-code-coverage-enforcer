@@ -124,8 +124,8 @@ module.exports = (function() {
     };
 
     /**
-    * Helper method to create an empty Lcov json object.
-    */
+     * Helper method to create an empty Lcov json object.
+     */
     exports.getEmptyLcovJsonEntry = function() {
         var item = {
             file: undefined,
@@ -205,7 +205,7 @@ module.exports = (function() {
 
         files = files.filter(function(filename) {
             //grunt.verbose.writeln("  testing for files");
-            if(includes && exports.isMatched(filename, replaceDirectory, includes)) {
+            if (includes && exports.isMatched(filename, replaceDirectory, includes)) {
                 if (excludes && exports.isMatched(filename, replaceDirectory, excludes)) {
                     console.log("Excluded: " + filename);
                     // grunt.log.writeln("Excluded: " + filename);
@@ -330,7 +330,7 @@ module.exports = (function() {
         });
 
         if (pass === false) {
-            grunt.fail.warn("Failed to meet code coverage threshold requirements");
+            console.log("Failed to meet code coverage threshold requirements.  This is a warning for now.  The builds will fail from V87 onwards if you do not have checkins that satisfy the standard code coverage limits (i.e. lines: 50% coverage, functions:50% coverage & branches: 50% coverage).");
         }
     };
 
