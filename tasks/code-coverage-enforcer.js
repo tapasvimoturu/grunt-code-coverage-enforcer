@@ -53,14 +53,14 @@ module.exports = function(grunt) {
         /* Initializing the default options.
          */
         var options = this.options({
-                lines: 50,
-                functions: 50,
-                branches: 0,
-                includes: ["**/*.js"],
-                src: process.cwd(), //array { path: "",thresholds: {} }
-                excludes: []
-            });
-        
+            lines: 50,
+            functions: 50,
+            branches: 0,
+            includes: ["**/*.js"],
+            src: process.cwd(), //array { path: "",thresholds: {} }
+            excludes: []
+        });
+
 
         grunt.verbose.writeln("Checking code coverage for threshold limits ....");
         grunt.verbose.writeln("Reading the lcov file ....");
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
                 //parse the lcov content and pass the json representation of the data to the anonymous function.
                 util.parseLcovContent(content, process.cwd(), function(lcovJson) {
                     //Check the threshold validity using the lcovJson with all the passed in configs
-                    util.checkThresholdValidity(lcovJson, options.src);
+                    util.checkThresholdValidity(lcovJson, options.src, process.cwd());
                 });
             });
         }

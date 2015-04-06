@@ -6,7 +6,7 @@ module.exports = (function(grunt) {
     exports.testNewLcovReader = function(test) {
         // debugger;
         test.expect(1);
-        var filename = "../zionjs/coverage/lcov.info",
+        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
             homeDirectory = "/Users/hsomani/githubProjects/zionjs";
         util.readFile(filename, function(content) {
             util.parseLcovContent(content, homeDirectory, function(data) {
@@ -21,7 +21,7 @@ module.exports = (function(grunt) {
     exports.testNewCheckThresholdValidity = function(test) {
         // debugger;
         test.expect(1);
-        var filename = "../zionjs/coverage/lcov.info",
+        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
             config = {
                 path: "/Users/hsomani/githubProjects/zionjs/lib",
                 lines: 75,
@@ -42,7 +42,7 @@ module.exports = (function(grunt) {
     exports.testNewCheckThresholdValidityWithMultipleConfigs = function(test) {
         debugger;
         test.expect(1);
-        var filename = "../zionjs/coverage/lcov.info",
+        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
             config = [{
                 path: "/Users/hsomani/githubProjects/zionjs/lib",
                 lines: 50,
@@ -54,7 +54,8 @@ module.exports = (function(grunt) {
                 lines: 50,
                 functions: 50,
                 branches: 50,
-                includes: ["middleware/**.js"]
+                includes: ["middleware/**.js"],
+                excludes: ["middleware/errorCatcher.js"]
             },{
                 path: "/Users/hsomani/githubProjects/zionjs/node_modules",
                 lines: 0,
