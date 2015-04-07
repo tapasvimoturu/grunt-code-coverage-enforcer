@@ -132,7 +132,6 @@ module.exports = (function() {
             lines: {
                 found: 0,
                 hit: 0
-
             },
             functions: {
                 hit: 0,
@@ -219,6 +218,7 @@ module.exports = (function() {
             // grunt.verbose.writeln("Included:" + filename);
             return true;
         });
+        return files;
     };;
 
     /**
@@ -284,7 +284,7 @@ module.exports = (function() {
         grunt.log.writeln("Scanning folder for files");
         grunt.log.writeln("------------------------------------------------------------------");
 
-        exports.collect(src, fileList, includes, excludes, homeDirectory);
+        fileList = exports.collect(src, fileList, includes, excludes, homeDirectory);
 
         grunt.log.writeln("------------------------------------------------------------------");
         grunt.log.writeln("Threshold configuration: lines:" + lines + "%, functions:" + functions + "%, branches:" + branches + "%");
@@ -312,7 +312,6 @@ module.exports = (function() {
                     branchesThreshold = fileData.branches.hit * 100 / fileData.branches.found;
                     branchesThreshold = parseFloat(branchesThreshold.toFixed(2));
                 }
-
                 if (lineThreshold >= config.lines && branchesThreshold >= config.branches && functionThreshold >= config.functions) {
                     console.log("The file:" + filename + " passed the code coverage.")
                     grunt.log.ok();
