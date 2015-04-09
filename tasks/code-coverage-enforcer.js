@@ -50,6 +50,8 @@ var fs = require("fs"),
 module.exports = function(grunt) {
     grunt.registerTask("code-coverage-enforcer", "Failing of a build when (lcov) code coverage thresholds are not met", function() {
 
+        var done = this.async();
+
         /* Initializing the default options.
          */
         var options = this.options({
@@ -76,13 +78,13 @@ module.exports = function(grunt) {
         if (options.lcovfile) {
             grunt.verbose.writeln("Processing File:" + options.lcovfile);
             //Read the lcov file and pass the contents of the file to the anonymous function.
-            util.readFile(options.lcovfile, function(content) {
-                //parse the lcov content and pass the json representation of the data to the anonymous function.
-                util.parseLcovContent(content, process.cwd(), function(lcovJson) {
-                    //Check the threshold validity using the lcovJson with all the passed in configs
-                    util.checkThresholdValidity(lcovJson, options.src, process.cwd());
-                });
+            util.parseLcov(options.lcovfile, process.cwd(), function(err, lcovJson) {
+                //Check the threshold validity using the lcovJson with all the passed in configs
+                util.checkThresholdValidity(lcovJson, options.src, process.cwd());
+                done();
             });
+        } else {
+            grunt.fail.warn("No lcov file information passed in the configurations.");
         }
 
     });

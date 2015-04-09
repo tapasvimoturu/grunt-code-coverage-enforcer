@@ -23,9 +23,10 @@
   },
   "license": "MIT",
   "dependencies": {
+    "json-stringify-safe": "5.0.0",
+    "lcov-parse": "0.0.9",
     "minimatch": "0.2.14",
-    "shelljs": "0.2.6",
-    "json-stringify-safe": "5.0.0"
+    "shelljs": "0.2.6"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

@@ -4,137 +4,136 @@ module.exports = (function(grunt) {
         exports = {};
     debugger;
     exports.testNewLcovReader = function(test) {
-        // debugger;
-        test.expect(1);
-        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-            homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-        util.readFile(filename, function(content) {
-            util.parseLcovContent(content, homeDirectory, function(data) {
-                console.log(data);
-                console.log(Object.keys(data).length);
-                test.equal(Object.keys(data).length, 23, "The coverage is not the same");
-            });
-        });
-        test.done();
-    };
-
-    exports.testNewCheckThresholdValidity = function(test) {
-        // debugger;
-        test.expect(1);
-        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-            config = {
-                path: "/Users/hsomani/githubProjects/zionjs/lib",
-                lines: 75,
-                functions: 60,
-                branches: 50,
-                includes: ["lib/**.js"]
-            },
-            homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-        util.readFile(filename, function(content) {
-            util.parseLcovContent(content, homeDirectory, function(data) {
-                util.checkThresholdValidityForConfig(data, config, homeDirectory);
-                test.equal("happy", "happy", "The coverage is not the same");
-            });
-        });
-        test.done();
-    };
-
-    exports.testNewCheckThresholdValidityWithMultipleConfigs = function(test) {
         debugger;
         test.expect(1);
-        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-            config = [{
-                path: "/Users/hsomani/githubProjects/zionjs/lib",
-                lines: 50,
-                functions: 50,
-                branches: 50,
-                includes: ["lib/**.js"]
-            },{
-                path: "/Users/hsomani/githubProjects/zionjs/middleware",
-                lines: 50,
-                functions: 50,
-                branches: 50,
-                includes: ["middleware/**.js"],
-                excludes: ["middleware/errorCatcher.js"]
-            },{
-                path: "/Users/hsomani/githubProjects/zionjs/node_modules",
-                lines: 0,
-                functions: 0,
-                branches: 0,
-                includes: ["**/**.js"]
-            }],
+        var filename = "/Users/hsomani/githubProjects/zionjs/coverage/lcov.info",
             homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-        util.readFile(filename, function(content) {
-            util.parseLcovContent(content, homeDirectory, function(data) {
-                util.checkThresholdValidity(data, config, homeDirectory);
-                test.equal("happy", "happy", "The coverage is not the same");
-            });
-        });
-        test.done();
-    };
-
-    exports.testConsoleLog = function(test) {
-        debugger;
-        test.expect(1);
-        var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-            config = [{
-                path: "/Users/hsomani/githubProjects/zionjs/lib",
-                lines: 100,
-                functions: 100,
-                branches: 100,
-                includes: ["lib/**.js"]
-            },{
-                path: "/Users/hsomani/githubProjects/zionjs/middleware",
-                lines: 100,
-                functions: 100,
-                branches: 100,
-                includes: ["middleware/**.js"],
-                excludes: ["middleware/errorCatcher.js"]
-            },{
-                path: "/Users/hsomani/githubProjects/zionjs/node_modules",
-                lines: 100,
-                functions: 100,
-                branches: 100,
-                includes: ["**/**.js"]
-            }],
-            homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-        util.readFile(filename, function(content) {
-            util.parseLcovContent(content, homeDirectory, function(data) {
-                util.checkThresholdValidity(data, config, homeDirectory);
-                test.equal("happy", "happy", "The coverage is not the same");
-            });
-        });
-        test.done();
-    };
-
-    exports.testNormalizeFileName = function(test) {
-        test.expect(3);
-
-        var filename = "./random_file_name.txt",
-            filename1 = "/random_file_name.txt",
-            filename2 = "random_file_name.txt";
-
-        test.equal("random_file_name.txt", util.normalizeFileName(filename), "The file name should get normalized.");
-        test.equal("random_file_name.txt", util.normalizeFileName(filename1), "The file name should get normalized.");
-        test.equal("random_file_name.txt", util.normalizeFileName(filename2), "The file name should get normalized.");
-
-        test.done();
-    };
-
-    exports.testReadFile = function(test) {
-        test.expect(2);
-
-        var filename = "./test/testFile.txt";
-
-        util.readFile(filename, function(content) {
-            test.equal("Read File Test.", content, "The file contents do not match");
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            console.log(data);
+            console.log(Object.keys(data).length);
+            test.equal(Object.keys(data).length, 23, "The coverage is not the same");
         });
 
-        test.throws(function() {
-            util.readFile("filename", null)
-        }, Error, "Could not read file.");
         test.done();
     };
+
+    // exports.testNewCheckThresholdValidity = function(test) {
+    //     // debugger;
+    //     test.expect(1);
+    //     var filename = "../../githubProjects/zionjs/coverage/lcov.info",
+    //         config = {
+    //             path: "/Users/hsomani/githubProjects/zionjs/lib",
+    //             lines: 75,
+    //             functions: 60,
+    //             branches: 50,
+    //             includes: ["lib/**.js"]
+    //         },
+    //         homeDirectory = "/Users/hsomani/githubProjects/zionjs";
+    //     util.readFile(filename, function(content) {
+    //         util.parseLcovContent(content, homeDirectory, function(data) {
+    //             util.checkThresholdValidityForConfig(data, config, homeDirectory);
+    //             test.equal("happy", "happy", "The coverage is not the same");
+    //         });
+    //     });
+    //     test.done();
+    // };
+
+    // exports.testNewCheckThresholdValidityWithMultipleConfigs = function(test) {
+    //     debugger;
+    //     test.expect(1);
+    //     var filename = "../../githubProjects/zionjs/coverage/lcov.info",
+    //         config = [{
+    //             path: "/Users/hsomani/githubProjects/zionjs/lib",
+    //             lines: 50,
+    //             functions: 50,
+    //             branches: 50,
+    //             includes: ["lib/**.js"]
+    //         }, {
+    //             path: "/Users/hsomani/githubProjects/zionjs/middleware",
+    //             lines: 50,
+    //             functions: 50,
+    //             branches: 50,
+    //             includes: ["middleware/**.js"],
+    //             excludes: ["middleware/errorCatcher.js"]
+    //         }, {
+    //             path: "/Users/hsomani/githubProjects/zionjs/node_modules",
+    //             lines: 0,
+    //             functions: 0,
+    //             branches: 0,
+    //             includes: ["**/**.js"]
+    //         }],
+    //         homeDirectory = "/Users/hsomani/githubProjects/zionjs";
+    //     util.readFile(filename, function(content) {
+    //         util.parseLcovContent(content, homeDirectory, function(data) {
+    //             util.checkThresholdValidity(data, config, homeDirectory);
+    //             test.equal("happy", "happy", "The coverage is not the same");
+    //         });
+    //     });
+    //     test.done();
+    // };
+
+    // exports.testConsoleLog = function(test) {
+    //     debugger;
+    //     test.expect(1);
+    //     var filename = "../../githubProjects/zionjs/coverage/lcov.info",
+    //         config = [{
+    //             path: "/Users/hsomani/githubProjects/zionjs/lib",
+    //             lines: 100,
+    //             functions: 100,
+    //             branches: 100,
+    //             includes: ["lib/**.js"]
+    //         }, {
+    //             path: "/Users/hsomani/githubProjects/zionjs/middleware",
+    //             lines: 100,
+    //             functions: 100,
+    //             branches: 100,
+    //             includes: ["middleware/**.js"],
+    //             excludes: ["middleware/errorCatcher.js"]
+    //         }, {
+    //             path: "/Users/hsomani/githubProjects/zionjs/node_modules",
+    //             lines: 100,
+    //             functions: 100,
+    //             branches: 100,
+    //             includes: ["**/**.js"]
+    //         }],
+    //         homeDirectory = "/Users/hsomani/githubProjects/zionjs";
+    //     util.readFile(filename, function(content) {
+    //         util.parseLcovContent(content, homeDirectory, function(data) {
+    //             util.checkThresholdValidity(data, config, homeDirectory);
+    //             test.equal("happy", "happy", "The coverage is not the same");
+    //         });
+    //     });
+    //     test.done();
+    // };
+
+    // exports.testNormalizeFileName = function(test) {
+    //     test.expect(3);
+
+    //     var filename = "./random_file_name.txt",
+    //         filename1 = "/random_file_name.txt",
+    //         filename2 = "random_file_name.txt";
+
+    //     test.equal("random_file_name.txt", util.normalizeFileName(filename), "The file name should get normalized.");
+    //     test.equal("random_file_name.txt", util.normalizeFileName(filename1), "The file name should get normalized.");
+    //     test.equal("random_file_name.txt", util.normalizeFileName(filename2), "The file name should get normalized.");
+
+    //     test.done();
+    // };
+
+    // exports.testReadFile = function(test) {
+    //     test.expect(2);
+
+    //     var filename = "./test/testFile.txt";
+
+    //     util.readFile(filename, function(content) {
+    //         test.equal("Read File Test.", content, "The file contents do not match");
+    //     });
+
+    //     test.throws(function() {
+    //         util.readFile("filename", null)
+    //     }, Error, "Could not read file.");
+    //     test.done();
+    // };
 
     // exports.testCheckThresholdValidityForConfig = function(test) {
     //     // test.expect(1);
