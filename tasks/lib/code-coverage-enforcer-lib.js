@@ -72,7 +72,7 @@ module.exports = (function() {
                     branchesThreshold: getThreshold(data[i].branches),
                     functionThreshold: getThreshold(data[i].functions),
                 }
-                console.log("mapping:" + exports.normalizeFileName(data[i].file.replace(workingDirectory, "")));
+                //console.log("mapping:" + exports.normalizeFileName(data[i].file.replace(workingDirectory, "")));
             };
             cb(err, retData);
         });
@@ -190,9 +190,9 @@ module.exports = (function() {
     /**
      * This function checks if the source file that are included in the config object satisfies
      * the code coverage threshold specified in the configuration.
-     * 
+     *
      * The return value of the function should be {
-        config: 
+        config:
         passFiles :[]
         failedFiles: []
      }
@@ -312,31 +312,25 @@ module.exports = (function() {
                 requiredLineCoverage = config.lines;
                 requiredBranchCoverage = config.branches;
                 requiredFunctionCoverage = config.functions;
-                logFn("File:" + file + " has passed the code coverage checks.  Existing coverage: Lines: " + lineCoverage +
-                    ", Branches: " + branchCoverage + ", Functions: " + functionCoverage + ". Required Coverage: Lines: " + 
-                    requiredLineCoverage + ", Branches: " + requiredBranchCoverage + ", Functions: " + requiredFunctionCoverage + ".");
+                logFn("Passed: " + file + " Actual: (" + lineCoverage +
+                    "L, " + branchCoverage + "B, " + functionCoverage + "F) Expected: (" +
+                    requiredLineCoverage + "L, " + requiredBranchCoverage + "B, " + requiredFunctionCoverage + "F)");
             });
             validityResults.failedFiles.forEach(function(file) {
-                lineCoverage = data[file].lineThreshold;
-                functionCoverage = data[file].functionThreshold;
-                branchCoverage = data[file].branchesThreshold;
+                lineCoverage = data[file] ? data[file].lineThreshold : 0;
+                functionCoverage = data[file] ? data[file].functionThreshold : 0;
+                branchCoverage = data[file] ? data[file].branchesThreshold : 0;
                 requiredLineCoverage = config.lines;
                 requiredBranchCoverage = config.branches;
                 requiredFunctionCoverage = config.functions;
-                logFn("File:" + file + " has failed the code coverage checks.  Existing coverage: Lines: " + lineCoverage +
-                    ", Branches: " + branchCoverage + ", Functions: " + functionCoverage + ". Required Coverage: Lines: " + 
-                    requiredLineCoverage + ", Branches: " + requiredBranchCoverage + ", Functions: " + requiredFunctionCoverage + ".");
+                logFn("Failed: " + file + " Actual: (" + lineCoverage +
+                    "L, " + branchCoverage + "B, " + functionCoverage + "F) Expected: (" +
+                    requiredLineCoverage + "L, " + requiredBranchCoverage + "B, " + requiredFunctionCoverage + "F)");
             });
             // logFn("========================================END========================================================");
         });
 
-        if (!pass) {
-            grunt.log.writeln();
-            grunt.log.writeln();
-            grunt.log.writeln();
-            grunt.log.writeln();
-            grunt.log.warn("Failed to meet code coverage threshold requirements.  This is a warning for now.  The builds will fail from V87 onwards if you do not have checkins that satisfy the standard code coverage limits (i.e. lines: 50% coverage, functions:50% coverage & branches: 50% coverage).");
-        }
+        return pass;
     };
 
 

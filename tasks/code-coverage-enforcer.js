@@ -38,6 +38,7 @@ var fs = require("fs"),
  * certain threshold. Here is a sample of the available options.
  * options: {
  *              lcovfile: "relative file path from cwd,
+ *              failMessage: "Oh! No. Code coverage not met."
  *              lines: <0-100>,
  *              functions: <0-100>,
  *              branches: <0-100>,
@@ -55,6 +56,7 @@ module.exports = function(grunt) {
         /* Initializing the default options.
          */
         var options = this.options({
+            failMessage: "Failed to meet code coverage threshold requirements.",
             lines: 50,
             functions: 50,
             branches: 0,
@@ -80,7 +82,13 @@ module.exports = function(grunt) {
             //Read the lcov file and pass the contents of the file to the anonymous function.
             util.parseLcov(options.lcovfile, process.cwd(), function(err, lcovJson) {
                 //Check the threshold validity using the lcovJson with all the passed in configs
-                util.checkThresholdValidity(lcovJson, options.src, process.cwd());
+                var hasPassed = util.checkThresholdValidity(lcovJson, options.src, process.cwd());
+
+                if (!hasPassed) {
+                    grunt.log.writeln();
+                    grunt.log.writeln();
+                    grunt.log.warn(options.failMessage);
+                }
                 done();
             });
         } else {
