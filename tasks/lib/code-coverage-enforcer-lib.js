@@ -68,11 +68,11 @@ module.exports = (function() {
 
             for (var i = data.length - 1; i >= 0; i--) {
                 retData[exports.normalizeFileName(data[i].file.replace(workingDirectory, ""))] = {
-                    lineThreshold: getThreshold(data[i].lines),
-                    branchesThreshold: getThreshold(data[i].branches),
-                    functionThreshold: getThreshold(data[i].functions),
-                }
-                //console.log("mapping:" + exports.normalizeFileName(data[i].file.replace(workingDirectory, "")));
+                        lineThreshold: getThreshold(data[i].lines),
+                        branchesThreshold: getThreshold(data[i].branches),
+                        functionThreshold: getThreshold(data[i].functions),
+                    }
+                    //console.log("mapping:" + exports.normalizeFileName(data[i].file.replace(workingDirectory, "")));
             };
             cb(err, retData);
         });
@@ -270,7 +270,7 @@ module.exports = (function() {
      * @param  {Array} data  An array that contains the individual configurations for threshold validity check.  See
      * @return {none}
      */
-    exports.checkThresholdValidity = function(data, configs, homeDirectory) {
+    exports.checkThresholdValidity = function(data, configs, homeDirectory, logCurrentCoverage) {
         //grunt.verbose.writeln("Processing LcovData:" + data);
         var pass = true,
             validityResultsArr = [],
@@ -303,34 +303,43 @@ module.exports = (function() {
             } else {
                 logFn = grunt.log.warn;
             }
-            // logFn("========================================BEGIN======================================================");
-            // logFn("Results of code coverage checks on config:" + configStr  );
             validityResults.passedFiles.forEach(function(file) {
-                lineCoverage = data[file].lineThreshold;
-                functionCoverage = data[file].functionThreshold;
-                branchCoverage = data[file].branchesThreshold;
-                requiredLineCoverage = config.lines;
-                requiredBranchCoverage = config.branches;
-                requiredFunctionCoverage = config.functions;
-                logFn("Passed: " + file + " Actual: (" + lineCoverage +
-                    "L, " + branchCoverage + "B, " + functionCoverage + "F) Expected: (" +
-                    requiredLineCoverage + "L, " + requiredBranchCoverage + "B, " + requiredFunctionCoverage + "F)");
+                if(!logCurrentCoverage) {
+                    printFileInfo(data, file, logFn, config, "Passed");
+                } else {
+                    printCoverageInfo(data, file);
+                }
             });
             validityResults.failedFiles.forEach(function(file) {
-                lineCoverage = data[file] ? data[file].lineThreshold : 0;
-                functionCoverage = data[file] ? data[file].functionThreshold : 0;
-                branchCoverage = data[file] ? data[file].branchesThreshold : 0;
-                requiredLineCoverage = config.lines;
-                requiredBranchCoverage = config.branches;
-                requiredFunctionCoverage = config.functions;
-                logFn("Failed: " + file + " Actual: (" + lineCoverage +
-                    "L, " + branchCoverage + "B, " + functionCoverage + "F) Expected: (" +
-                    requiredLineCoverage + "L, " + requiredBranchCoverage + "B, " + requiredFunctionCoverage + "F)");
+                if(!logCurrentCoverage) {
+                    printFileInfo(data, file, logFn, config, "Failed");
+                } else {
+                    printCoverageInfo(data, file);
+                }
             });
-            // logFn("========================================END========================================================");
         });
 
         return pass;
+    };
+
+    var printCoverageInfo = function(data, file) {
+        var lineCoverage = data[file] ? data[file].lineThreshold : 0;
+        var functionCoverage = data[file] ? data[file].functionThreshold : 0;
+        var branchCoverage = data[file] ? data[file].branchesThreshold : 0;
+        var obj = { path: file, lines: lineCoverage, functions:functionCoverage, branches:branchCoverage}
+        grunt.log.writeln(JSON.stringify(obj) + ",");
+    };
+
+    var printFileInfo = function(data, file, logFunction, config, status) {
+        var lineCoverage = data[file] ? data[file].lineThreshold : 0;
+        var functionCoverage = data[file] ? data[file].functionThreshold : 0;
+        var branchCoverage = data[file] ? data[file].branchesThreshold : 0;
+        var requiredLineCoverage = config.lines;
+        var requiredBranchCoverage = config.branches;
+        var requiredFunctionCoverage = config.functions;
+        logFunction(status + ": " + file + " Actual: (" + lineCoverage +
+            "L, " + branchCoverage + "B, " + functionCoverage + "F) Expected: (" +
+            requiredLineCoverage + "L, " + requiredBranchCoverage + "B, " + requiredFunctionCoverage + "F)");
     };
 
 
