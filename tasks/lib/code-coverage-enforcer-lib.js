@@ -295,24 +295,20 @@ module.exports = (function() {
         });
 
         validityResultsArr.forEach(function(validityResults) {
-            var logFn, config = validityResults.config,
+            var config = validityResults.config,
                 lineCoverage, functionCoverage,
                 branchCoverage, requiredLineCoverage, requiredBranchCoverage, requiredFunctionCoverage;
-            if (validityResults.isPass) {
-                logFn = grunt.log.ok;
-            } else {
-                logFn = grunt.log.warn;
-            }
+                
             validityResults.passedFiles.forEach(function(file) {
                 if(!logCurrentCoverage) {
-                    printFileInfo(data, file, logFn, config, "Passed");
+                    printFileInfo(data, file, grunt.log.ok, config, "Passed");
                 } else {
                     printCoverageInfo(data, file);
                 }
             });
             validityResults.failedFiles.forEach(function(file) {
                 if(!logCurrentCoverage) {
-                    printFileInfo(data, file, logFn, config, "Failed");
+                    printFileInfo(data, file, grunt.log.warn, config, "Failed");
                 } else {
                     printCoverageInfo(data, file);
                 }
