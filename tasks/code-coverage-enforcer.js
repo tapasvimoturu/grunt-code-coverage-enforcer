@@ -66,7 +66,8 @@ module.exports = function(grunt) {
             logCurrentCoverage: false,
             passMessage: "Yay! All is well!",
             failMessage: "Failed to meet code coverage threshold requirements.",
-            failBuild: true
+            failBuild: true,
+            failBuildThreshold: 50
         });
 
 
@@ -86,7 +87,7 @@ module.exports = function(grunt) {
             //Read the lcov file and pass the contents of the file to the anonymous function.
             util.parseLcov(options.lcovfile, process.cwd(), function(err, lcovJson) {
                 //Check the threshold validity using the lcovJson with all the passed in configs
-                var hasPassed = util.checkThresholdValidity(lcovJson, options.src, process.cwd(), options.logCurrentCoverage);
+                var hasPassed = util.checkThresholdValidity(lcovJson, options.src, process.cwd(), options.logCurrentCoverage, options.failBuildThreshold);
 
                 grunt.log.writeln();
                 grunt.log.writeln();

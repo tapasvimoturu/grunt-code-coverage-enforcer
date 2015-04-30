@@ -71,9 +71,9 @@ module.exports = (function() {
                         lineThreshold: getThreshold(data[i].lines),
                         branchesThreshold: getThreshold(data[i].branches),
                         functionThreshold: getThreshold(data[i].functions),
-                    }
+                    };
                     //console.log("mapping:" + exports.normalizeFileName(data[i].file.replace(workingDirectory, "")));
-            };
+            }
             cb(err, retData);
         });
     };
@@ -148,7 +148,7 @@ module.exports = (function() {
             return true;
         });
         return files;
-    }
+    };
 
     /**
      * Checks whether a file matches the list of patterns specified.
@@ -201,7 +201,7 @@ module.exports = (function() {
      * @param  {config} data  Config for checking validity check for a specific folder.  See
      * @return {none}
      */
-    exports.checkThresholdValidityForConfig = function(data, config, homeDirectory) {
+    exports.checkThresholdValidityForConfig = function(data, config, homeDirectory, failBuildThreshold) {
         var src = config.path,
             lines = config.lines,
             functions = config.functions,
@@ -215,7 +215,8 @@ module.exports = (function() {
                 config: null,
                 isPass: true,
                 passedFiles: [],
-                failedFiles: []
+                failedFiles: [],
+                needsAttentionFiles: []
             };
         validityResults.config = config;
         // grunt.log.writeln("------------------------------------------------------------------");
@@ -244,9 +245,13 @@ module.exports = (function() {
                 } else {
                     // console.log("The file:" + filename + " with coverage threshold, linesThreshold: " + fileData.lineThreshold + ", branchesThreshold: " + fileData.branchesThreshold + ", functionThreshold: " + fileData.functionThreshold + " does not have the appropriate code coverage.")
                     // grunt.log.error();
-                    validityResults.failedFiles.push(filename);
-                    validityResults.isPass = false;
-                    pass = false;
+                    if (config.lines >= failBuildThreshold && config.branches >= failBuildThreshold && config.functions >= failBuildThreshold) {
+                        validityResults.failedFiles.push(filename);
+                        validityResults.isPass = false;
+                    } else {
+                        validityResults.needsAttentionFiles.push(filename);
+                    }
+                    // pass = false;
                 }
             } else if (config.lines === 0 && config.functions === 0 && config.branches === 0) {
                 validityResults.passedFiles.push(filename);
@@ -255,7 +260,7 @@ module.exports = (function() {
                 validityResults.failedFiles.push(filename);
                 validityResults.isPass = false;
                 // console.log("FAILED file:" + filename + " :: Has no code coverage data. Ensure that the source file is represented in test coverage (lcov) data");
-                pass = false;
+                // pass = false;
             }
         });
 
@@ -270,14 +275,17 @@ module.exports = (function() {
      * @param  {Array} data  An array that contains the individual configurations for threshold validity check.  See
      * @return {none}
      */
-    exports.checkThresholdValidity = function(data, configs, homeDirectory, logCurrentCoverage) {
+    exports.checkThresholdValidity = function(data, configs, homeDirectory, logCurrentCoverage, failBuildThreshold) {
         //grunt.verbose.writeln("Processing LcovData:" + data);
         var pass = true,
             validityResultsArr = [],
+            needsAttentionFiles = {},
+            failedFiles = {},
+            file,
             validityResults;
 
         configs.forEach(function(config) {
-            validityResults = exports.checkThresholdValidityForConfig(data, config, homeDirectory);
+            validityResults = exports.checkThresholdValidityForConfig(data, config, homeDirectory, failBuildThreshold);
             pass = pass && validityResults.isPass;
             validityResultsArr.push(validityResults);
         });
@@ -298,22 +306,41 @@ module.exports = (function() {
             var config = validityResults.config,
                 lineCoverage, functionCoverage,
                 branchCoverage, requiredLineCoverage, requiredBranchCoverage, requiredFunctionCoverage;
-                
+
             validityResults.passedFiles.forEach(function(file) {
-                if(!logCurrentCoverage) {
+                if (!logCurrentCoverage) {
                     printFileInfo(data, file, grunt.log.ok, config, "Passed");
                 } else {
                     printCoverageInfo(data, file);
                 }
             });
             validityResults.failedFiles.forEach(function(file) {
-                if(!logCurrentCoverage) {
-                    printFileInfo(data, file, grunt.log.warn, config, "Failed");
+                failedFiles[file] = config;
+            });
+            validityResults.needsAttentionFiles.forEach(function(file) {
+                needsAttentionFiles[file] = config;
+            });
+        });
+
+        for (file in needsAttentionFiles) {
+            if (needsAttentionFiles.hasOwnProperty(file)) {
+                if (!logCurrentCoverage) {
+                    printFileInfo(data, file, grunt.log.warn, needsAttentionFiles[file], "Needs Attention");
                 } else {
                     printCoverageInfo(data, file);
                 }
-            });
-        });
+            }
+        }
+
+        for (file in failedFiles) {
+            if (failedFiles.hasOwnProperty(file)) {
+                if (!logCurrentCoverage) {
+                    printFileInfo(data, file, grunt.log.warn, failedFiles[file], "Failed");
+                } else {
+                    printCoverageInfo(data, file);
+                }
+            }
+        }
 
         return pass;
     };
@@ -322,7 +349,12 @@ module.exports = (function() {
         var lineCoverage = data[file] ? data[file].lineThreshold : 0;
         var functionCoverage = data[file] ? data[file].functionThreshold : 0;
         var branchCoverage = data[file] ? data[file].branchesThreshold : 0;
-        var obj = { path: file, lines: lineCoverage, functions:functionCoverage, branches:branchCoverage}
+        var obj = {
+            path: file,
+            lines: lineCoverage,
+            functions: functionCoverage,
+            branches: branchCoverage
+        }
         grunt.log.writeln(JSON.stringify(obj) + ",");
     };
 
