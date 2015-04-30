@@ -41,7 +41,7 @@ module.exports = (function() {
     // Add public functions to exports object to be used by the Grunt integration.
     var exports = {};
 
-    /* 
+    /*
      * This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter
      * has the filename when it is in the current folder but Karma add as ./ in front of the file
      */
@@ -246,32 +246,34 @@ module.exports = (function() {
      * collect(options.src, fileList, options.includes, options.excludes, null);
      */
     exports.collect = function(fp, files, includes, excludes, filter) {
-        //grunt.verbose.writeln("trying to collect: " + fp +",filesLength:" + files.length +",includes:" + includes + ",excludes:"+excludes);
-        //grunt.verbose.writeln("  testing for excludes");
+        grunt.verbose.writeln("trying to collect: " + fp +",filesLength:" + files.length +",includes:" + includes + ",excludes:"+excludes);
+        grunt.verbose.writeln("  testing for excludes");
 
         if (excludes && exports.isMatched(fp, excludes)) {
-            if ((filter && filter(fp) || !filter) {
-                grunt.log.writeln("Exluded: " + fp);
-                return;
-            }
+            grunt.verbose.writeln("Exluded: " + fp);
+            return;
         }
 
         if (!shjs.test("-e", fp)) {
             grunt.verbose.error("Can't open " + fp);
             return;
         }
-        //grunt.verbose.writeln("  testing for files");
+        grunt.verbose.writeln("  testing for files");
 
         if (shjs.test("-f", fp) || shjs.test("-L", fp)) {
+            if (filter && !filter(fp)) {
+                //grunt.log.writeln("Exluded: " + fp);
+                return;
+            }
 
             if (exports.isMatched(fp, includes)) {
-                // /grunt.verbose.writeln("pushing file 1:" + fp);
+                grunt.verbose.writeln("pushing file 1:" + fp);
                 files.push(fp);
             }
             return;
         }
 
-        //grunt.verbose.writeln("  testing for directory");
+        grunt.verbose.writeln("  testing for directory");
 
         if (shjs.test("-d", fp)) {
             grunt.verbose.writeln("Collecting directory:" + fp);
@@ -299,9 +301,9 @@ module.exports = (function() {
      * @return {boolean} "true" if file matches, "false" if file doesnt match.
      */
     exports.isMatched = function(fp, patterns) {
-        //grunt.verbose.writeln("Matching file:" + fp +" with pattern:" + patterns);
+        grunt.verbose.writeln("Matching file:" + fp +" with pattern:" + patterns);
         return patterns.some(function(ip) {
-            //grunt.verbose.writeln("  checking for match with: " + ip);
+            grunt.verbose.writeln("  checking for match with: " + ip);
             var file = path.resolve(fp).replace(process.cwd(), "").trim();
 
             file = exports.normalizeFileName(file);
@@ -309,21 +311,21 @@ module.exports = (function() {
             if (minimatch(file, ip, {
                     nocase: true
                 })) {
-                //grunt.verbose.writeln(file + ", Matched::file with regular expression");
+                grunt.verbose.writeln(file + ", Matched::file with regular expression");
                 return true;
             }
 
             if (file === ip) {
-                //grunt.verbose.writeln(fp + ", Matched::file exactly");
+                grunt.verbose.writeln(fp + ", Matched::file exactly");
                 return true;
             }
 
             if (shjs.test("-d", fp) && ip.match(/^[^\/]*\/?$/) &&
                 file.match(new RegExp("^" + ip))) {
-                //grunt.verbose.writeln(fp+ ", Matched::regular expression:" + "^" + ip + "*" );
+                grunt.verbose.writeln(fp+ ", Matched::regular expression:" + "^" + ip + "*" );
                 return true;
             }
-            //grunt.verbose.writeln(fp + ", Did not Match");
+            grunt.verbose.writeln(fp + ", Did not Match");
             return false;
         });
     };
@@ -360,7 +362,7 @@ module.exports = (function() {
                         excluded = false;
                     }
                 });
-                //grunt.verbose.writeln("Checking if file is excluded: " + filename + "excluded:" + excluded);
+                grunt.verbose.writeln("Checking if file is excluded: " + filename + "excluded:" + excluded);
                 return excluded;
             },
             isFileInPath = function(src, filename) {
@@ -445,7 +447,7 @@ module.exports = (function() {
             data.forEach(function(fileData, index) {
                 var lcov = fileData.file.replace(process.cwd(), "");
                 lcov = exports.normalizeFileName(lcov);
-                //grunt.verbose.writeln("Comparing filenames:" + lcov +"," + filename);
+                grunt.verbose.writeln("Comparing filenames:" + lcov +"," + filename);
                 var normalizedFileName = exports.normalizeFileName(filename.replace(process.cwd(),""));
                 if (lcov === normalizedFileName) {
                     representedInLcov = true;
@@ -463,9 +465,9 @@ module.exports = (function() {
     };
 
     /**
-     * This function checks that the included files satisfies all the configurations that 
+     * This function checks that the included files satisfies all the configurations that
      * are specified in the configs object.
-     * 
+     *
      * @param  {Array} data  An array that contains the parsed contents of the lcov file.  See
      * @param  {Array} data  An array that contains the individual configurations for threshold validity check.  See
      * @return {none}
@@ -484,15 +486,15 @@ module.exports = (function() {
     * code coverage configuration.  If the src object is not a string then it expects the src
     * object to be an array of code coverage configuration. for e.g.
     * src could either be "./src" or
-    * src could be 
-    * [{ 
+    * src could be
+    * [{
         path:"./src/todo",
         lines: 20,
         functions: 20,
         includes:["./src/todo/**.js"],
         excludes:["./src/todo/test/**.js"]
     * },
-    * { 
+    * {
         path:"./src/feature",
         lines: 20,
         branches: 20,
@@ -535,9 +537,9 @@ module.exports = (function() {
                 if(!conf.excludes) {
                     conf.excludes = excludes;
                 }
-                
+
                 if(!conf.filter) {
-                    conf.excludes = filter;
+                    conf.filter = filter;
                 }
             });
         } else {
