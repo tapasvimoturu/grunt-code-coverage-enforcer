@@ -63,7 +63,7 @@ module.exports = function(grunt) {
                     return false;
                 }
             });
-        
+
 
         grunt.verbose.writeln("Checking code coverage for threshold limits ....");
         grunt.verbose.writeln("Reading the lcov file ....");
