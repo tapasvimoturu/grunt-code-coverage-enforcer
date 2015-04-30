@@ -224,10 +224,11 @@ module.exports = (function() {
     exports.gather = function(opts) {
         var files = [],
             excludes = options.exclude,
+            filter = options.filter,
             includes = options.src;
 
         opts.args.forEach(function(target) {
-            collect(target, files, includes, excludes);
+            collect(target, files, includes, excludes, filter);
         });
 
         return files;
@@ -244,13 +245,15 @@ module.exports = (function() {
      *
      * collect(options.src, fileList, options.includes, options.excludes, null);
      */
-    exports.collect = function(fp, files, includes, excludes) {
+    exports.collect = function(fp, files, includes, excludes, filter) {
         //grunt.verbose.writeln("trying to collect: " + fp +",filesLength:" + files.length +",includes:" + includes + ",excludes:"+excludes);
         //grunt.verbose.writeln("  testing for excludes");
 
         if (excludes && exports.isMatched(fp, excludes)) {
-            grunt.log.writeln("Exluded: " + fp);
-            return;
+            if ((filter && filter(fp) || !filter) {
+                grunt.log.writeln("Exluded: " + fp);
+                return;
+            }
         }
 
         if (!shjs.test("-e", fp)) {
@@ -276,9 +279,9 @@ module.exports = (function() {
 
                 var itempath = path.join(fp, item);
                 if (shjs.test("-d", itempath)) {
-                    exports.collect(itempath, files, includes, excludes);
+                    exports.collect(itempath, files, includes, excludes, filter);
                 } else {
-                    exports.collect(itempath, files, includes, excludes);
+                    exports.collect(itempath, files, includes, excludes, filter);
                     return;
                 }
             });
@@ -340,6 +343,7 @@ module.exports = (function() {
             branches = config.branches,
             includes = config.includes,
             excludes = config.excludes,
+            filter = config.filter,
             pass = true,
             length = data.length,
             fileList = [],
@@ -378,7 +382,7 @@ module.exports = (function() {
         grunt.log.writeln("Scanning folder for files");
         grunt.log.writeln("------------------------------------------------------------------");
 
-        exports.collect(src, fileList, includes, excludes, null);
+        exports.collect(src, fileList, includes, excludes, filter);
 
         fileList.forEach(function(filename, index) {
             grunt.verbose.writeln("Included:" + filename);
@@ -497,7 +501,7 @@ module.exports = (function() {
     * }]
     * for eg. normalizeSrcToObj("./src", 20, 20, 20,["*.js"],["abc.js"]) => [{src:"src",lines:20,functions:20,branches:20, includes:["*.js"], excludes:["abc.js"]}]
     */
-    exports.normalizeSrcToObj = function(src, lines, functions, branches, includes, excludes) {
+    exports.normalizeSrcToObj = function(src, lines, functions, branches, includes, excludes, filter) {
         var configs = [], config ={};
         if(typeof(src)==="string") {
             config.path = src;
@@ -506,6 +510,7 @@ module.exports = (function() {
             config.branches = branches;
             config.includes = includes;
             config.excludes = excludes;
+            config.filter = filter;
             configs.push(config);
         } else if(Array.isArray(src)) {//typeof is of array... or has push method
             configs = src;
@@ -529,6 +534,10 @@ module.exports = (function() {
 
                 if(!conf.excludes) {
                     conf.excludes = excludes;
+                }
+                
+                if(!conf.filter) {
+                    conf.excludes = filter;
                 }
             });
         } else {
