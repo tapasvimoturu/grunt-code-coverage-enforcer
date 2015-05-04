@@ -257,8 +257,12 @@ module.exports = (function() {
                 validityResults.passedFiles.push(filename);
                 // console.log("Skipping file: " + filename + " as the threshold is set to 0.")
             } else {
-                validityResults.failedFiles.push(filename);
-                validityResults.isPass = false;
+                if (config.lines >= failBuildThreshold && config.branches >= failBuildThreshold && config.functions >= failBuildThreshold) {
+                    validityResults.failedFiles.push(filename);
+                    validityResults.isPass = false;
+                } else {
+                    validityResults.needsAttentionFiles.push(filename);
+                }
                 // console.log("FAILED file:" + filename + " :: Has no code coverage data. Ensure that the source file is represented in test coverage (lcov) data");
                 // pass = false;
             }
