@@ -34,11 +34,11 @@ module.exports = function(grunt) {
                 reporter: 'verbose'
             }
         },
-				debug: {
-					open:true
-				}
+		debug: {
+			open:true
+		}
     });
-
+    grunt.loadNpmTasks('grunt-debug-task');
     grunt.loadNpmTasks('grunt-contrib-nodeunit');
     // Actually load this plugin's task(s).
     grunt.loadTasks("tasks");

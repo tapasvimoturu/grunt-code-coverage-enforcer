@@ -1,233 +1,351 @@
 module.exports = (function(grunt) {
     "use strict";
     var util = require("../tasks/lib/code-coverage-enforcer-lib"),
+        assert = require("chai").assert,
+        sinon = require("sinon"),
+        grunt = require("grunt"),
+        filename = process.cwd() + "/test/lcov.info",
+        homeDirectory = "/Users/hsomani/githubProjects/zionjs/lib",
         exports = {};
-    debugger;
     exports.testNewLcovReader = function(test) {
-        debugger;
-        test.expect(1);
-        var filename = "/Users/hsomani/githubProjects/zionjs/coverage/lcov.info",
-            homeDirectory = "/Users/hsomani/githubProjects/zionjs";
+        test.expect(2);
         util.parseLcov(filename, homeDirectory, function(err, data) {
-            console.log(data);
-            console.log(Object.keys(data).length);
-            test.equal(Object.keys(data).length, 23, "The coverage is not the same");
+            test.ok(!err, "No errors parsing the lcov file.");
+            test.equal(Object.keys(data).length, 23, "The coverage data is found");
+            test.done();
         });
-
-        test.done();
     };
 
-    // exports.testNewCheckThresholdValidity = function(test) {
-    //     // debugger;
-    //     test.expect(1);
-    //     var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-    //         config = {
-    //             path: "/Users/hsomani/githubProjects/zionjs/lib",
-    //             lines: 75,
-    //             functions: 60,
-    //             branches: 50,
-    //             includes: ["lib/**.js"]
-    //         },
-    //         homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-    //     util.readFile(filename, function(content) {
-    //         util.parseLcovContent(content, homeDirectory, function(data) {
-    //             util.checkThresholdValidityForConfig(data, config, homeDirectory);
-    //             test.equal("happy", "happy", "The coverage is not the same");
-    //         });
-    //     });
-    //     test.done();
-    // };
+    exports.testCheckThresholdValidityWithAllFilesPassed = function(test) {
+        var fileList = [
+                "/Users/hsomani/githubProjects/zionjs/lib/configUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/HeaderUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/logger.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/processUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/errors.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/jsonformat.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/ResponseUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/ZionException.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteBootstrap.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteCreater.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteParser.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/routeUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/securityUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/shutdown.js"
+            ],
+            failBuildThreshold = 50,
+            configurations = [{
+                "path": "cookieUtil.js",
+                "lines": 50,
+                "functions": 50,
+                "branches": 50
+            }, {
+                "path": "HeaderUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "logger.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "processUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/errors.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/jsonformat.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/ResponseUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/ZionException.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteBootstrap.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteCreater.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteParser.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/routeUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "securityUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "shutdown.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }];
+        test.expect(2);
+        var collectStub = sinon.stub(util, "collect", function(fp, files, includes, excludes, replaceDirectory) {
+            files.push(fp);
+            return files;
+        });
+        var gruntLogOkSpy = sinon.spy(grunt.log, "ok");
 
-    // exports.testNewCheckThresholdValidityWithMultipleConfigs = function(test) {
-    //     debugger;
-    //     test.expect(1);
-    //     var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-    //         config = [{
-    //             path: "/Users/hsomani/githubProjects/zionjs/lib",
-    //             lines: 50,
-    //             functions: 50,
-    //             branches: 50,
-    //             includes: ["lib/**.js"]
-    //         }, {
-    //             path: "/Users/hsomani/githubProjects/zionjs/middleware",
-    //             lines: 50,
-    //             functions: 50,
-    //             branches: 50,
-    //             includes: ["middleware/**.js"],
-    //             excludes: ["middleware/errorCatcher.js"]
-    //         }, {
-    //             path: "/Users/hsomani/githubProjects/zionjs/node_modules",
-    //             lines: 0,
-    //             functions: 0,
-    //             branches: 0,
-    //             includes: ["**/**.js"]
-    //         }],
-    //         homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-    //     util.readFile(filename, function(content) {
-    //         util.parseLcovContent(content, homeDirectory, function(data) {
-    //             util.checkThresholdValidity(data, config, homeDirectory);
-    //             test.equal("happy", "happy", "The coverage is not the same");
-    //         });
-    //     });
-    //     test.done();
-    // };
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+            test.ok(hasPassed, "The coverage check has passed");
+            test.equal(gruntLogOkSpy.callCount, 14, "All files passed");
+            gruntLogOkSpy.restore();
+            collectStub.restore();
+            test.done();
+        });
+    };
 
-    // exports.testConsoleLog = function(test) {
-    //     debugger;
-    //     test.expect(1);
-    //     var filename = "../../githubProjects/zionjs/coverage/lcov.info",
-    //         config = [{
-    //             path: "/Users/hsomani/githubProjects/zionjs/lib",
-    //             lines: 100,
-    //             functions: 100,
-    //             branches: 100,
-    //             includes: ["lib/**.js"]
-    //         }, {
-    //             path: "/Users/hsomani/githubProjects/zionjs/middleware",
-    //             lines: 100,
-    //             functions: 100,
-    //             branches: 100,
-    //             includes: ["middleware/**.js"],
-    //             excludes: ["middleware/errorCatcher.js"]
-    //         }, {
-    //             path: "/Users/hsomani/githubProjects/zionjs/node_modules",
-    //             lines: 100,
-    //             functions: 100,
-    //             branches: 100,
-    //             includes: ["**/**.js"]
-    //         }],
-    //         homeDirectory = "/Users/hsomani/githubProjects/zionjs";
-    //     util.readFile(filename, function(content) {
-    //         util.parseLcovContent(content, homeDirectory, function(data) {
-    //             util.checkThresholdValidity(data, config, homeDirectory);
-    //             test.equal("happy", "happy", "The coverage is not the same");
-    //         });
-    //     });
-    //     test.done();
-    // };
+    exports.testCheckThresholdValidityForFailedFiles = function(test) {
+        var fileList = [
+                "/Users/hsomani/githubProjects/zionjs/lib/configUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/HeaderUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/logger.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/processUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/errors.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/jsonformat.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/ResponseUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/ZionException.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteBootstrap.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteCreater.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteParser.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/routeUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/securityUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/shutdown.js"
+            ],
+            failBuildThreshold = 50,
+            configurations = [{
+                "path": "cookieUtil.js",
+                "lines": 100,
+                "functions": 100,
+                "branches": 100
+            }, {
+                "path": "HeaderUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "logger.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "processUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/errors.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/jsonformat.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/ResponseUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/ZionException.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteBootstrap.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteCreater.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteParser.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/routeUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "securityUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "shutdown.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }];
+        test.expect(4);
+        var collectStub = sinon.stub(util, "collect", function(fp, files, includes, excludes, replaceDirectory) {
+            files.push(fp);
+            return files;
+        });
+        var gruntLogOkSpy = sinon.spy(grunt.log, "ok");
+        var gruntLogWarnSpy = sinon.spy(grunt.log, "warn");
 
-    // exports.testNormalizeFileName = function(test) {
-    //     test.expect(3);
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+            test.ok(!hasPassed, "Coverage dropped for files");
+            test.equal(gruntLogOkSpy.callCount, 13, "13 files should pass");
+            test.equal(gruntLogWarnSpy.callCount, 1, "1 file should fail");
+            test.ok(gruntLogWarnSpy.calledWith("Failed: cookieUtil.js Actual: (79.31L, 75B, 66.67F) Expected: (100L, 100B, 100F)"), "Failed files found");
+            gruntLogOkSpy.restore();
+            gruntLogWarnSpy.restore();
+            collectStub.restore();
+            test.done();
+        });
+    };
 
-    //     var filename = "./random_file_name.txt",
-    //         filename1 = "/random_file_name.txt",
-    //         filename2 = "random_file_name.txt";
+    exports.testCheckThresholdValidityForFailedAndNeedsAttentionFiles = function(test) {
+        var fileList = [
+                "/Users/hsomani/githubProjects/zionjs/lib/configUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/HeaderUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/logger.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/processUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/errors.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/jsonformat.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/ResponseUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/response/ZionException.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteBootstrap.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteCreater.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/RouteParser.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/route/routeUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/securityUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/shutdown.js"
+            ],
+            failBuildThreshold = 80,
+            configurations = [{
+                "path": "cookieUtil.js",
+                "lines": 78,
+                "functions": 100,
+                "branches": 100
+            }, {
+                "path": "HeaderUtil.js",
+                "lines": 90,
+                "functions": 80,
+                "branches": 80
+            }, {
+                "path": "logger.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "processUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/errors.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/jsonformat.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/ResponseUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "response/ZionException.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteBootstrap.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteCreater.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/RouteParser.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "route/routeUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "securityUtil.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }, {
+                "path": "shutdown.js",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20
+            }];
+        test.expect(5);
+        var collectStub = sinon.stub(util, "collect", function(fp, files, includes, excludes, replaceDirectory) {
+            files.push(fp);
+            return files;
+        });
+        var gruntLogOkSpy = sinon.spy(grunt.log, "ok");
+        var gruntLogWarnSpy = sinon.spy(grunt.log, "warn");
 
-    //     test.equal("random_file_name.txt", util.normalizeFileName(filename), "The file name should get normalized.");
-    //     test.equal("random_file_name.txt", util.normalizeFileName(filename1), "The file name should get normalized.");
-    //     test.equal("random_file_name.txt", util.normalizeFileName(filename2), "The file name should get normalized.");
-
-    //     test.done();
-    // };
-
-    // exports.testReadFile = function(test) {
-    //     test.expect(2);
-
-    //     var filename = "./test/testFile.txt";
-
-    //     util.readFile(filename, function(content) {
-    //         test.equal("Read File Test.", content, "The file contents do not match");
-    //     });
-
-    //     test.throws(function() {
-    //         util.readFile("filename", null)
-    //     }, Error, "Could not read file.");
-    //     test.done();
-    // };
-
-    // exports.testCheckThresholdValidityForConfig = function(test) {
-    //     // test.expect(1);
-
-    //     var item = [{
-    //             file: "/Users/hsomani/githubProjects/grunt-code-coverage-enforcer/tasks/code-coverage-enforcer.js",
-    //             lines: {
-    //                 found: 20,
-    //                 hit: 10
-    //             },
-    //             functions: {
-    //                 hit: 10,
-    //                 found: 20
-    //             },
-    //             branches: {
-    //                 hit: 10,
-    //                 found: 20
-    //             }
-    //         }],
-    //         options = {
-    //             path: process.cwd(),
-    //             includes: ["tasks/**.js"],
-    //             excludes: ["tasks/lib/**.js"],
-    //             lines: 60,
-    //             functions: 50,
-    //             branches: 50
-    //         };
-
-
-    //     test.throws(function() {
-    //         util.checkThresholdValidityForConfig(item, options);
-    //     }, Error, "Threshold not met test.");
-    //     test.done();
-    // };
-
-    // exports.testNormalizeSrcToObjBaseCase = function(test) {
-    //     test.expect(1);
-    //     var src = process.cwd(),
-    //         functions = 20,
-    //         branches = 20,
-    //         lines = 20,
-    //         includes = ["/**.js", "/**.js"],
-    //         excludes = ["/**.js", "/**.js"],
-    //         returnValue, testValue = [{
-    //             path: process.cwd().substring(1),
-    //             lines : 20,
-    //             functions : 20,
-    //             branches : 20,
-    //             includes : ["/**.js", "/**.js"],
-    //             excludes : ["/**.js", "/**.js"]
-    //         }];
-    //     returnValue = util.normalizeSrcToObj(src, lines, functions, branches, includes, excludes);
-    //     test.strictEqual(JSON.stringify(returnValue), JSON.stringify(testValue), "The base case works");
-    //     test.done();
-    // };
-
-    // exports.testCheckThresholdValidity = function(test) {
-    //     // test.expect(1);
-
-    //     var item = [{
-    //             file: "/Users/hsomani/githubProjects/grunt-code-coverage-enforcer/tasks/code-coverage-enforcer.js",
-    //             lines: {
-    //                 found: 20,
-    //                 hit: 10
-    //             },
-    //             functions: {
-    //                 hit: 10,
-    //                 found: 20
-    //             },
-    //             branches: {
-    //                 hit: 10,
-    //                 found: 20
-    //             }
-    //         }],
-    //         options = [{
-    //             path: process.cwd(),
-    //             includes: ["tasks/**.js"],
-    //             excludes: ["tasks/lib/**.js"],
-    //             lines: 40,
-    //             functions: 40,
-    //             branches: 40
-    //         }, {
-    //             path: process.cwd(),
-    //             includes: ["tasks/**.js"],
-    //             excludes: ["tasks/lib/**.js"],
-    //             lines: 40,
-    //             functions: 40,
-    //             branches: 40
-    //         }];
-
-
-    //     util.checkThresholdValidity(item, options);
-    //     test.done();
-    // };
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+            test.ok(!hasPassed, "Coverage dropped for files");
+            test.equal(gruntLogOkSpy.callCount, 12, "13 files should pass");
+            test.equal(gruntLogWarnSpy.callCount, 2, "2 file should fail");
+            test.ok(gruntLogWarnSpy.calledWith("Needs Attention: cookieUtil.js Actual: (79.31L, 75B, 66.67F) Expected: (78L, 100B, 100F)"), "Needs attention file found");
+            test.ok(gruntLogWarnSpy.calledWith("Failed: HeaderUtil.js Actual: (100L, 75B, 100F) Expected: (90L, 80B, 80F)"), "Failed files found");
+            gruntLogOkSpy.restore();
+            gruntLogWarnSpy.restore();
+            collectStub.restore();
+            test.done();
+        });
+    };
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
 
     return exports;
 
