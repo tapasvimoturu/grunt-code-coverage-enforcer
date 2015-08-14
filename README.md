@@ -115,7 +115,12 @@ the default threshold values are
             branches: 0,
             includes: ["**/*.js"],
             src: process.cwd(),
-            excludes: []
+            excludes: [],
+            logCurrentCoverage: false,//logs the coverage information for all the include files if true
+            passMessage: "Yay! All is well!",//Message configuration for passed coverage checks
+            failMessage: "Failed to meet code coverage threshold requirements.", //Message configuration for failed coverage checks.
+            failBuild: true, //If you want to fail the build if coverage checks pass or fail.
+            failBuildThreshold: 0 // Fine grained configuration to configure to build failures
         }
 ```
 
@@ -160,6 +165,41 @@ Default value: `[]`
 
 The matchers required to compare files within the src location that are to be excluded.
 
+#### logCurrentCoverage
+Type: `boolean`
+Default value: `[false]`
+
+Can be used to log the current coverage limits.
+
+#### passMessage
+Type: `string`
+Default value: `Yay! All is well!`
+
+Message to print when the coverage checks pass
+
+#### failMessage
+Type: `string`
+Default value: `Failed to meet code coverage threshold requirements.`
+
+Message to print when the coverage checks fail
+
+#### failBuild
+Type: `boolean`
+Default value: `true`
+
+Whether to fail the build when the coverage checks fail.  Recommend to keep this configuration value to true always.  You can set it to false, when you are
+initially trying/testing out this grunt task.
+
+#### failBuildThreshold
+Type: `Number`
+Default value: `0`
+
+This is a fine grained control that is added to control the behavior of the grunt task for existing projects that may not have good code coverage for all
+the files in the project.  For e.g. in your project x if most of the files have coverage above 40%, but there are some files in the project whose
+coverage is below 40% and you expect that those files don't get the love they deserve, you can set the failBuildThreshold to 40%.  This will put the
+files below 40% whose coverage dropped in the needs attention section and continue to fail build for the files whose coverage dropped for the files
+with existing coverage more than 40%.  Needless to mention that the way the task would know the previous coverage configuration is if you tell this task
+what the existing coverage are by passing the information in 'src' option
 
 
 
@@ -255,6 +295,11 @@ You can now simply invoke this from command line using
 The project includes jshint and jscs config as part of its dev grunt tasks. Please run grunt lint to ensure that the code passes the code conventions.
 
 Once you have your code ready ready please make a pull request to the author.
+
+## Release History
+March 17 2-15
+0.3.0: Performance improvements, Refactoring of the code by using existing grunt tasks to simplify the code.  Added a few more configuration options
+that will help with finer controls on how coverage enforcer functions.
 
 ## Release History
 March 17 2-15

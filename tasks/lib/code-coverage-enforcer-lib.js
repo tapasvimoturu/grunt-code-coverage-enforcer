@@ -55,10 +55,20 @@ module.exports = (function() {
         return filename;
     };
 
+    /**
+     * Returns the threshold value for the statistics of line coverage, branch coverage or function coverage.
+     * @param  {hit: number, found: number} stat is an object that stores the hit and the found statistics.
+     * @return {[number]}      Returns the hit/found % back to the caller of the function
+     */
     function getThreshold(stat) {
         return (stat.found === 0) ? 100 : parseFloat((stat.hit * 100 / stat.found).toFixed(2));
     }
-
+    /**
+     * Parses the lcovFile and callsback the cb with the err and the coverage data that is collected from the lcovFile
+     * @param  {[String]}   lcovFile         the lcovFile location
+     * @param  {[String]}   workingDirectory current working directory.
+     * @param  {Function} cb               Call back function to call when the file has been parsed and the coverage data has been collected from the lcovFile
+     */
     exports.parseLcov = function(lcovFile, workingDirectory, cb) {
         lcovParse(lcovFile, function(err, data) {
             var retData = {};
@@ -135,8 +145,12 @@ module.exports = (function() {
             //grunt.verbose.writeln("  testing for files");
             if (includes && exports.isMatched(filename, replaceDirectory, includes)) {
                 if (excludes && exports.isMatched(filename, replaceDirectory, excludes)) {
+<<<<<<< HEAD
                     console.log("Excluded: " + filename);
                     // grunt.log.writeln("Excluded: " + filename);
+=======
+                    grunt.log.writeln("Excluded: " + filename);
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
                     return false;
                 } else {
                     //the file should be included for checking threshold.
@@ -219,6 +233,7 @@ module.exports = (function() {
                 needsAttentionFiles: []
             };
         validityResults.config = config;
+<<<<<<< HEAD
         // grunt.log.writeln("------------------------------------------------------------------");
         // grunt.log.writeln("Running threshold checks for the following path config:" + config.path);
         // grunt.verbose.writeln("Current config:" + JSON.stringify(config));
@@ -232,30 +247,44 @@ module.exports = (function() {
         // grunt.log.writeln("------------------------------------------------------------------");
         // grunt.log.writeln("Threshold configuration: lines:" + lines + "%, functions:" + functions + "%, branches:" + branches + "%");
         // grunt.log.writeln("------------------------------------------------------------------");
+=======
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
 
+        fileList = exports.collect(src, fileList, includes, excludes, homeDirectory);
         fileList.forEach(function(filename, index) {
             var fName = exports.normalizeFileName(filename.replace(homeDirectory, ""));
             var fileData = data[fName];
 
             if (fileData) {
                 if (fileData.lineThreshold >= config.lines && fileData.branchesThreshold >= config.branches && fileData.functionThreshold >= config.functions) {
+<<<<<<< HEAD
                     // console.log("The file:" + filename + " passed the code coverage.")
                     validityResults.passedFiles.push(filename);
                     // grunt.log.ok();
                 } else {
                     // console.log("The file:" + filename + " with coverage threshold, linesThreshold: " + fileData.lineThreshold + ", branchesThreshold: " + fileData.branchesThreshold + ", functionThreshold: " + fileData.functionThreshold + " does not have the appropriate code coverage.")
                     // grunt.log.error();
+=======
+                    validityResults.passedFiles.push(filename);
+                } else {
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
                     if (config.lines >= failBuildThreshold && config.branches >= failBuildThreshold && config.functions >= failBuildThreshold) {
                         validityResults.failedFiles.push(filename);
                         validityResults.isPass = false;
                     } else {
                         validityResults.needsAttentionFiles.push(filename);
                     }
+<<<<<<< HEAD
                     // pass = false;
                 }
             } else if (config.lines === 0 && config.functions === 0 && config.branches === 0) {
                 validityResults.passedFiles.push(filename);
                 // console.log("Skipping file: " + filename + " as the threshold is set to 0.")
+=======
+                }
+            } else if (config.lines === 0 && config.functions === 0 && config.branches === 0) {
+                validityResults.passedFiles.push(filename);
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
             } else {
                 if (config.lines >= failBuildThreshold && config.branches >= failBuildThreshold && config.functions >= failBuildThreshold) {
                     validityResults.failedFiles.push(filename);
@@ -263,11 +292,16 @@ module.exports = (function() {
                 } else {
                     validityResults.needsAttentionFiles.push(filename);
                 }
+<<<<<<< HEAD
                 // console.log("FAILED file:" + filename + " :: Has no code coverage data. Ensure that the source file is represented in test coverage (lcov) data");
                 // pass = false;
             }
         });
 
+=======
+            }
+        });
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
         return validityResults;
     };
 
@@ -304,6 +338,7 @@ module.exports = (function() {
             } else if (!result1.isPass && !result2.isPass) {
                 return 1;
             }
+<<<<<<< HEAD
         });
 
         validityResultsArr.forEach(function(validityResults) {
@@ -326,6 +361,30 @@ module.exports = (function() {
             });
         });
 
+=======
+        });
+
+        validityResultsArr.forEach(function(validityResults) {
+            var config = validityResults.config,
+                lineCoverage, functionCoverage,
+                branchCoverage, requiredLineCoverage, requiredBranchCoverage, requiredFunctionCoverage;
+
+            validityResults.passedFiles.forEach(function(file) {
+                if (!logCurrentCoverage) {
+                    printFileInfo(data, file, grunt.log.ok, config, "Passed");
+                } else {
+                    printCoverageInfo(data, file);
+                }
+            });
+            validityResults.failedFiles.forEach(function(file) {
+                failedFiles[file] = config;
+            });
+            validityResults.needsAttentionFiles.forEach(function(file) {
+                needsAttentionFiles[file] = config;
+            });
+        });
+
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
         for (file in needsAttentionFiles) {
             if (needsAttentionFiles.hasOwnProperty(file)) {
                 if (!logCurrentCoverage) {
@@ -348,7 +407,16 @@ module.exports = (function() {
 
         return pass;
     };
+<<<<<<< HEAD
 
+=======
+    /**
+     * utility function to print the coverage information.
+     * @param  {[type]} data [description]
+     * @param  {[type]} file [description]
+     * @return {[type]}      [description]
+     */
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
     var printCoverageInfo = function(data, file) {
         var lineCoverage = data[file] ? data[file].lineThreshold : 0;
         var functionCoverage = data[file] ? data[file].functionThreshold : 0;
@@ -362,6 +430,18 @@ module.exports = (function() {
         grunt.log.writeln(JSON.stringify(obj) + ",");
     };
 
+<<<<<<< HEAD
+=======
+    /**
+     * utility function to print the file information
+     * @param  {[type]} data        [description]
+     * @param  {[type]} file        [description]
+     * @param  {[type]} logFunction [description]
+     * @param  {[type]} config      [description]
+     * @param  {[type]} status      [description]
+     * @return {[type]}             [description]
+     */
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
     var printFileInfo = function(data, file, logFunction, config, status) {
         var lineCoverage = data[file] ? data[file].lineThreshold : 0;
         var functionCoverage = data[file] ? data[file].functionThreshold : 0;

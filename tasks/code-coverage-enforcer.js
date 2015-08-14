@@ -67,7 +67,7 @@ module.exports = function(grunt) {
             passMessage: "Yay! All is well!",
             failMessage: "Failed to meet code coverage threshold requirements.",
             failBuild: true,
-            failBuildThreshold: 50
+            failBuildThreshold: 0
         });
 
 
@@ -86,6 +86,7 @@ module.exports = function(grunt) {
             grunt.verbose.writeln("Processing File:" + options.lcovfile);
             //Read the lcov file and pass the contents of the file to the anonymous function.
             util.parseLcov(options.lcovfile, process.cwd(), function(err, lcovJson) {
+<<<<<<< HEAD
                 //Check the threshold validity using the lcovJson with all the passed in configs
                 var hasPassed = util.checkThresholdValidity(lcovJson, options.src, process.cwd(), options.logCurrentCoverage, options.failBuildThreshold);
 
@@ -102,6 +103,30 @@ module.exports = function(grunt) {
                 }
                 done();
            });
+=======
+
+                if (err) {
+                    grunt.fail.fatal("An error occurred while processing the lcov file " + options.lcovfile + "");
+                } else {
+
+                    //Check the threshold validity using the lcovJson with all the passed in configs
+                    var hasPassed = util.checkThresholdValidity(lcovJson, options.src, process.cwd(), options.logCurrentCoverage, options.failBuildThreshold);
+
+                    grunt.log.writeln();
+                    grunt.log.writeln();
+                    if (!hasPassed) {
+                        if (options.failBuild) {
+                            grunt.fail.fatal(options.failMessage);
+                        } else {
+                            grunt.log.warn(options.failMessage);
+                        }
+                    } else {
+                        grunt.log.ok(options.passMessage);
+                    }
+                }
+                done();
+            });
+>>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
         } else {
             grunt.fail.warn("No lcov file information passed in the configurations.");
         }
