@@ -41,7 +41,7 @@ module.exports = (function() {
     // Add public functions to exports object to be used by the Grunt integration.
     var exports = {};
 
-    /* 
+    /*
      * This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter
      * has the filename when it is in the current folder but Karma add as ./ in front of the file
      */
@@ -459,9 +459,9 @@ module.exports = (function() {
     };
 
     /**
-     * This function checks that the included files satisfies all the configurations that 
+     * This function checks that the included files satisfies all the configurations that
      * are specified in the configs object.
-     * 
+     *
      * @param  {Array} data  An array that contains the parsed contents of the lcov file.  See
      * @param  {Array} data  An array that contains the individual configurations for threshold validity check.  See
      * @return {none}
@@ -480,15 +480,15 @@ module.exports = (function() {
     * code coverage configuration.  If the src object is not a string then it expects the src
     * object to be an array of code coverage configuration. for e.g.
     * src could either be "./src" or
-    * src could be 
-    * [{ 
+    * src could be
+    * [{
         path:"./src/todo",
         lines: 20,
         functions: 20,
         includes:["./src/todo/**.js"],
         excludes:["./src/todo/test/**.js"]
     * },
-    * { 
+    * {
         path:"./src/feature",
         lines: 20,
         branches: 20,
@@ -511,15 +511,15 @@ module.exports = (function() {
             configs = src;
             configs.forEach(function(conf) {
 
-                if(!conf.lines) {
+                if(conf.lines === null || conf.lines === undefined) {
                     conf.lines = lines;
                 }
 
-                if(!conf.functions) {
+                if(conf.functions === null || conf.functions === undefined) {
                     conf.functions = functions;
                 }
 
-                if(!conf.branches) {
+                if(conf.branches === null || conf.branches === undefined) {
                     conf.branches = branches;
                 }
 
