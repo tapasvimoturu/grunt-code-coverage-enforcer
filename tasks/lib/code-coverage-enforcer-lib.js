@@ -511,15 +511,15 @@ module.exports = (function() {
             configs = src;
             configs.forEach(function(conf) {
 
-                if(!conf.hasOwnProperty("lines")) {
+                if(conf.lines === null || conf.lines === undefined) {
                     conf.lines = lines;
                 }
 
-                if(!conf.hasOwnProperty("functions")) {
+                if(conf.functions === null || conf.functions === undefined) {
                     conf.functions = functions;
                 }
 
-                if(!conf.hasOwnProperty("branches")) {
+                if(conf.branches === null || conf.branches === undefined) {
                     conf.branches = branches;
                 }
 
