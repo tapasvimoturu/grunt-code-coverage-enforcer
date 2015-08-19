@@ -345,8 +345,6 @@ module.exports = (function(grunt) {
             test.done();
         });
     };
->>>>>>> Performance improvement for big size projects, Added more configuration option for the grunt task, and updated tests
-
     return exports;
 
 }());
