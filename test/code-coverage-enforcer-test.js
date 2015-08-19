@@ -345,6 +345,31 @@ module.exports = (function(grunt) {
             test.done();
         });
     };
+
+    exports.testNormalizeSrcToObjWithNumericOverridesContainingZero = function(test) {
+        test.expect(1);
+        var functions = 20,
+            branches = 20,
+            lines = 20,
+            includes = ["/**.js", "/**.js"],
+            excludes = ["/**.js", "/**.js"],
+            testValue = [{
+                path: process.cwd().substring(1),
+                lines: 0,
+                functions: 0,
+                branches: 0,
+                includes: ["/**.js", "/**.js"],
+                excludes: ["/**.js", "/**.js"]
+            }],
+            expectedValue = JSON.stringify(testValue),
+            returnValue;
+
+        returnValue = util.normalizeSrcToObj(testValue, lines, functions, branches, includes, excludes);
+
+        test.strictEqual(JSON.stringify(returnValue), expectedValue, "Overrides provided in the config should be respected even if numeric values are 0.");
+
+        test.done();
+    };
     return exports;
 
 }());
