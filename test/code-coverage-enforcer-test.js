@@ -4,15 +4,18 @@ module.exports = (function(grunt) {
         exports = {};
 
     exports.testNormalizeFileName = function(test) {
-        test.expect(3);
+        test.expect(4);
 
         var filename = "./random_file_name.txt",
             filename1 = "/random_file_name.txt",
-            filename2 = "random_file_name.txt";
+            filename2 = "random_file_name.txt",
+            filename3 = ".\\random_file_name.txt";
+
 
         test.equal("random_file_name.txt", util.normalizeFileName(filename), "The file name should get normalized.");
         test.equal("random_file_name.txt", util.normalizeFileName(filename1), "The file name should get normalized.");
         test.equal("random_file_name.txt", util.normalizeFileName(filename2), "The file name should get normalized.");
+        test.equal("random_file_name.txt", util.normalizeFileName(filename3), "The file name should get normalized.");
 
         test.done();
     };
