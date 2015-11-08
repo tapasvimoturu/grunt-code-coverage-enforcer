@@ -249,7 +249,7 @@ module.exports = (function() {
         //grunt.verbose.writeln("  testing for excludes");
 
         if (excludes && exports.isMatched(fp, excludes)) {
-            grunt.log.writeln("Exluded: " + fp);
+            grunt.log.writeln("Excluded: " + fp);
             return;
         }
 
