@@ -41,14 +41,17 @@ module.exports = (function() {
     // Add public functions to exports object to be used by the Grunt integration.
     var exports = {};
 
-    /* 
+    /*
      * This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter
      * has the filename when it is in the current folder but Karma add as ./ in front of the file
      */
     exports.normalizeFileName = function(filename) {
         if (filename.substring(0, 2) === "./") {
             filename = filename.substring(2);
-        } else if (filename.substring(0, 1) === "/") {
+        } else if (filename.substring(0, 2) === ".\\") {
+            filename = filename.substring(2);
+        }
+        else if (filename.substring(0, 1) === "/") {
             filename = filename.substring(1);
         }
         return filename;
