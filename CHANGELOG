@@ -15,4 +15,11 @@ January 26th 2016
 Release version 1.0.0
  Updated support for windows file name comparisons.
 
+
+
+January 26th 2016
+Release version 2.0.0
+ Completely revamped processing logic for performance improvements Refactoring of the code by using existing grunt tasks to simplify the code.  Added a few more configuration options that will help with finer controls on how coverage enforcer functions. Logging current coverage values to file. Pass and fail message customizations are now supported
+
+ Big thanks to @happysomani for working on this. 
  

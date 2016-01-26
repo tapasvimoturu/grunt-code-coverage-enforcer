@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Intuit Inc.
+ * Copyright 2016 Intuit Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ var fs = require("fs"),
  * certain threshold. Here is a sample of the available options.
  * options: {
  *              lcovfile: "relative file path from cwd,
+ *              failMessage: "Oh! No. Code coverage not met."
  *              lines: <0-100>,
  *              functions: <0-100>,
  *              branches: <0-100>,
@@ -47,22 +48,26 @@ var fs = require("fs"),
  *          }
  * @author Tapasvi Moturu
  */
-module.exports = function(grunt) {
-    grunt.registerTask("code-coverage-enforcer", "Failing of a build when (lcov) code coverage thresholds are not met", function() {
+module.exports = function (grunt) {
+    grunt.registerTask("code-coverage-enforcer", "Failing of a build when (lcov) code coverage thresholds are not met", function () {
+
+        var done = this.async();
 
         /* Initializing the default options.
          */
         var options = this.options({
-                lines: 50,
-                functions: 50,
-                branches: 0,
-                includes: ["**/*.js"],
-                src: process.cwd(), //array { path: "",thresholds: {} }
-                excludes: [],
-                filter: function(fp) {
-                    return false;
-                }
-            });
+            lines: 50,
+            functions: 50,
+            branches: 0,
+            includes: ["**/*.js"],
+            src: process.cwd(), //array { path: "",thresholds: {} }
+            excludes: [],
+            logCurrentCoverage: false,
+            passMessage: "Yay! All is well!",
+            failMessage: "Failed to meet code coverage threshold requirements.",
+            failBuild: true,
+            failBuildThreshold: 0
+        });
 
 
         grunt.verbose.writeln("Checking code coverage for threshold limits ....");
@@ -79,13 +84,30 @@ module.exports = function(grunt) {
         if (options.lcovfile) {
             grunt.verbose.writeln("Processing File:" + options.lcovfile);
             //Read the lcov file and pass the contents of the file to the anonymous function.
-            util.readFile(options.lcovfile, function(content) {
-                //parse the lcov content and pass the json representation of the data to the anonymous function.
-                util.parseLcovContent(content, function(lcovJson) {
+            util.parseLcov(options.lcovfile, process.cwd(), function (err, lcovJson) {
+                if (err) {
+                    grunt.fail.fatal("An error occurred while processing the lcov file " + options.lcovfile + "");
+                } else {
+
                     //Check the threshold validity using the lcovJson with all the passed in configs
-                    util.checkThresholdValidity(lcovJson, options.src);
-                });
+                    var hasPassed = util.checkThresholdValidity(lcovJson, options.src, process.cwd(), options.logCurrentCoverage, options.failBuildThreshold);
+
+                    grunt.log.writeln();
+                    grunt.log.writeln();
+                    if (!hasPassed) {
+                        if (options.failBuild) {
+                            grunt.fail.fatal(options.failMessage);
+                        } else {
+                            grunt.log.warn(options.failMessage);
+                        }
+                    } else {
+                        grunt.log.ok(options.passMessage);
+                    }
+                }
+                done();
             });
+        } else {
+            grunt.fail.warn("No lcov file information passed in the configurations.");
         }
 
     });

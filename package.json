@@ -1,47 +1,50 @@
 {
-  "name": "grunt-code-coverage-enforcer",
-  "version": "1.0.0",
-  "description": "Enforces code coverage thresholds for a project with lcov files.",
-  "homepage": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer",
-  "author": {
-    "name": "Tapasvi Moturu",
-    "email": "tapasvi.moturu@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer"
-  },
-  "bugs": {
-    "url": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer/issues"
-  },
-  "keywords": [
-    "gruntplugin"
-  ],
-  "main": "Gruntfile.js",
-  "engines": {
-    "node": ">= 0.8.0"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "minimatch": "0.2.14",
-    "shelljs": "0.2.6",
-    "json-stringify-safe": "5.0.0"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-jshint": "~0.8.0",
-    "grunt-contrib-nodeunit": "~0.3.0",
-    "grunt-debug-task": "^0.1.5",
-    "grunt-jscs-checker": "0.4.2",
-    "grunt-jsdoc": "0.5.4",
-    "intern": "1.6.2",
-    "jshint-stylish": "~0.1.5",
-    "load-grunt-config": "^0.8.0",
-    "load-grunt-tasks": "~0.3.0",
-    "time-grunt": "0.3.1"
-  },
-  "scripts": {
-    "test": "grunt test"
-  }
+    "name": "grunt-code-coverage-enforcer",
+    "version": "2.0.0-rc.1",
+    "description": "Enforces code coverage thresholds for a project with lcov files.",
+    "homepage": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer",
+    "author": {
+        "name": "Tapasvi Moturu",
+        "email": "tapasvi.moturu@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer"
+    },
+    "bugs": {
+        "url": "https://github.com/tapasvimoturu/grunt-code-coverage-enforcer/issues"
+    },
+    "keywords": [
+        "gruntplugin"
+    ],
+    "main": "Gruntfile.js",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "json-stringify-safe": "5.0.0",
+        "lcov-parse": "0.0.9",
+        "minimatch": "0.2.14",
+        "shelljs": "0.2.6"
+    },
+    "devDependencies": {
+        "chai": "^3.2.0",
+        "grunt": "~0.4.2",
+        "grunt-contrib-clean": "~0.5.0",
+        "grunt-contrib-jshint": "~0.8.0",
+        "grunt-contrib-nodeunit": "~0.3.0",
+        "grunt-debug-task": "^0.1.7",
+        "grunt-jscs-checker": "0.4.2",
+        "grunt-jsdoc": "0.5.4",
+        "intern": "1.6.2",
+        "jshint-stylish": "~0.1.5",
+        "load-grunt-config": "^0.8.0",
+        "load-grunt-tasks": "~0.3.0",
+        "sinon": "^1.15.4",
+        "time-grunt": "0.3.1"
+    },
+    "scripts": {
+        "test": "grunt test"
+    }
 }
