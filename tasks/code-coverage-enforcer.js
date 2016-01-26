@@ -58,9 +58,12 @@ module.exports = function(grunt) {
                 branches: 0,
                 includes: ["**/*.js"],
                 src: process.cwd(), //array { path: "",thresholds: {} }
-                excludes: []
+                excludes: [],
+                filter: function(fp) {
+                    return false;
+                }
             });
-        
+
 
         grunt.verbose.writeln("Checking code coverage for threshold limits ....");
         grunt.verbose.writeln("Reading the lcov file ....");
@@ -70,7 +73,7 @@ module.exports = function(grunt) {
         options.excludes = util.normalizeOSPath(options.excludes);
 
         //Adapt the original options to the list of configs that will be used for validating the code coverage.
-        options.src = util.normalizeSrcToObj(options.src, options.lines, options.functions, options.branches, options.includes, options.excludes);
+        options.src = util.normalizeSrcToObj(options.src, options.lines, options.functions, options.branches, options.includes, options.excludes, options.filter);
         // options.src = util.normalizeOSPath(options.src);
 
         if (options.lcovfile) {
