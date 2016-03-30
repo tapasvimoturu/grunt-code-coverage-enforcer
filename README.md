@@ -52,7 +52,7 @@ intern:  {
 
 
 
-### Sample Karma config
+### Sample Karma config 
 (http://karma-runner.github.io/0.8/config/coverage.html)
 ```js
 coverageReporter = {
@@ -62,7 +62,7 @@ coverageReporter = {
 }
 ```
 
-### Sample Istanbul config
+### Sample Istanbul config 
 (https://github.com/gotwarlost/istanbul, https://www.npmjs.org/package/grunt-istanbul-coverage, https://www.npmjs.org/package/grunt-mocha-istanbul)
 
 Cli version of istanbul has a report parameter that you need to set to lcov or lcovonly. By default it should generate the lcov files.
@@ -78,7 +78,7 @@ Here is one suc example for the grunt-mocha-istanbul plugin
 
 ### Mocha
 Mocha has an lcov reporter that can be foounf here https://nodejsmodules.org/pkg/mocha-lcov-reporter
-You can also use istanbul with Mocha using the plugin here
+You can also use istanbul with Mocha using the plugin here 
 https://github.com/pocesar/grunt-mocha-istanbul
 
 
@@ -107,7 +107,7 @@ grunt.initConfig({
 })
 ```
 
-the default threshold values are
+the default threshold values are 
 ```js
           {
             lines: 50,
@@ -211,7 +211,7 @@ A regular expression used for matching the file extensions of source files that 
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used
+In this example, the default options are used 
 
 ```js
 grunt.initConfig({
@@ -254,18 +254,18 @@ grunt.initConfig({
         functions: 60, // Global function coverage configuration
         branches: 60, // Global branch coverage configuration
         src: [{
-          path:"middleware",
+          path:"middleware", 
           lines:90
         }, {
-          path:"backend",
-          lines: 90,
+          path:"backend", 
+          lines: 90, 
           functions: 80
         }, {
-          path:"frontend",
-          lines: 90,
+          path:"frontend", 
+          lines: 90, 
           functions: 80,
-          branches:70,
-          includes:["**.js"],
+          branches:70, 
+          includes:["**.js"], 
           excludes:["frontend/exclude.js"]
         }
         includes: ["src/**/*.js"],
@@ -286,7 +286,7 @@ If any of the configuration option is not provided for a given folder/package, t
 
 We recommend using a specific task names build acceptance that will run the code-coverage-enforcer along with other build acceptance type of tasks.
 
-Here is an example config that should go into your Gruntfile
+Here is an example config that should go into your Gruntfile 
 ```js
 
     grunt.registerTask("build-acceptance", ["code-coverage-enforcer"]);
@@ -314,6 +314,6 @@ June 19 2014
 Initial Release.
 
 ## License
-Copyright (c) 2014 Intuit Inc.
+Copyright (c) 2014 Intuit Inc. 
 
 Licensed under the MIT license.
