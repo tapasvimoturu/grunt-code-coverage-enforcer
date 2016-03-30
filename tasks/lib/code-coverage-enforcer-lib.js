@@ -121,13 +121,14 @@ module.exports = (function () {
      * @param {array}  files   a pointer to an array that stores a list of files
      * @param {array}  includes a list of patterns for files to match
      * @param {array}  excludes a list of patterns for files to ignore
+     * @param {string} extension    an optional regular expression for matching file extensions
      *
      * collect(options.src, fileList, options.includes, options.excludes, null);
      */
-    exports.collect = function (fp, files, includes, excludes, replaceDirectory) {
+    exports.collect = function (fp, files, includes, excludes, replaceDirectory, extension) {
         if (shjs.test("-d", fp)) {
             shjs.find(fp).filter(function (file) {
-                if (file.match(/\.js$/)) {
+                if (file.match(extension || /\.js$/)) {
                     files.push(file);
                 }
             });
@@ -217,6 +218,7 @@ module.exports = (function () {
             branches = config.branches,
             includes = config.includes,
             excludes = config.excludes,
+            extension = config.extension,
             pass = true,
             length = data.length,
             fileList = [],
@@ -228,7 +230,7 @@ module.exports = (function () {
                 needsAttentionFiles: []
             };
         validityResults.config = config;
-        fileList = exports.collect(src, fileList, includes, excludes, homeDirectory);
+        fileList = exports.collect(src, fileList, includes, excludes, homeDirectory, extension);
         fileList.forEach(function (filename, index) {
             var fName = exports.normalizeFileName(filename.replace(homeDirectory, ""));
             var fileData = data[fName];
@@ -400,7 +402,7 @@ module.exports = (function () {
     * }]
     * for eg. normalizeSrcToObj("./src", 20, 20, 20,["*.js"],["abc.js"]) => [{src:"src",lines:20,functions:20,branches:20, includes:["*.js"], excludes:["abc.js"]}]
     */
-    exports.normalizeSrcToObj = function (src, lines, functions, branches, includes, excludes) {
+    exports.normalizeSrcToObj = function (src, lines, functions, branches, includes, excludes, extension) {
         var configs = [],
             config = {};
         if (typeof (src) === "string") {
@@ -410,6 +412,7 @@ module.exports = (function () {
             config.branches = branches;
             config.includes = includes;
             config.excludes = excludes;
+            config.extension = extension;
             configs.push(config);
         } else if (Array.isArray(src)) { //typeof is of array... or has push method
             configs = src;
@@ -428,6 +431,9 @@ module.exports = (function () {
                 }
                 if (!conf.excludes) {
                     conf.excludes = excludes;
+                }
+                if (typeof conf.extension) {
+                    conf.extension = extension;
                 }
                 conf.path = exports.normalizeFileName(conf.path);
             });
