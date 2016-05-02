@@ -1,3 +1,6 @@
+"use strict";
+/* jshint node: true */
+
 /**
  * Copyright 2016 Intuit Inc.
  * All rights reserved.
@@ -25,19 +28,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-var fs = require("fs"),
-    path = require("path"),
-    stringify = require("json-stringify-safe"),
+var path = require("path"),
     shjs = require("shelljs"),
     minimatch = require("minimatch"),
     grunt = require("grunt"),
-    lcovParse = require('lcov-parse');
+    lcovParse = require("lcov-parse");
 
-
-module.exports = (function () {
-
-    "use strict";
+module.exports = (function() {
 
     // Add public functions to exports object to be used by the Grunt integration.
     var exports = {};
@@ -46,7 +43,7 @@ module.exports = (function () {
      * This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter
      * has the filename when it is in the current folder but Karma add as ./ in front of the file
      */
-    exports.normalizeFileName = function (filename) {
+    exports.normalizeFileName = function(filename) {
         if (filename.substring(0, 2) === "./") {
             filename = filename.substring(2);
         } else if (filename.substring(0, 1) === "/") {
@@ -69,8 +66,8 @@ module.exports = (function () {
      * @param  {[String]}   workingDirectory current working directory.
      * @param  {Function} cb               Call back function to call when the file has been parsed and the coverage data has been collected from the lcovFile
      */
-    exports.parseLcov = function (lcovFile, workingDirectory, cb) {
-        lcovParse(lcovFile, function (err, data) {
+    exports.parseLcov = function(lcovFile, workingDirectory, cb) {
+        lcovParse(lcovFile, function(err, data) {
             var retData = {};
             if (!data) {
                 return retData;
@@ -89,9 +86,9 @@ module.exports = (function () {
     };
 
     //normalizing all path properties.
-    exports.normalizeOSPath = function (fp) {
+    exports.normalizeOSPath = function(fp) {
         var arr = [],
-            normalizeFile = function (f) {
+            normalizeFile = function(f) {
                 if (path.sep === "\\") {
                     //Current Machine is windows style
                     f = f.replace(/\//g, "\\");
@@ -104,7 +101,7 @@ module.exports = (function () {
             };
 
         if (fp instanceof Array) {
-            fp.forEach(function (file) {
+            fp.forEach(function(file) {
                 arr.push(normalizeFile(file));
             });
             return arr;
@@ -124,10 +121,16 @@ module.exports = (function () {
      *
      * collect(options.src, fileList, options.includes, options.excludes, null);
      */
-    exports.collect = function (fp, files, includes, excludes, replaceDirectory) {
+    exports.collect = function(fp, files, includes, excludes, replaceDirectory) {
+        var extension, extensionRegex;
+
         if (shjs.test("-d", fp)) {
-            shjs.find(fp).filter(function (file) {
-                if (file.match(/\.js$/)) {
+            shjs.find(fp).filter(function(file) {
+                if (includes.some(function(pattern) {
+                    extension = pattern.match(/\.[0-9a-z]+$/)[0];
+                    extensionRegex = "\\" + extension + "$";
+                    return file.match(extensionRegex);
+                })) {
                     files.push(file);
                 }
             });
@@ -140,8 +143,8 @@ module.exports = (function () {
     /**
      * Returns the list of filtered files based on the includes and excludes patterns
      */
-    exports.filter = function (files, includes, excludes, replaceDirectory) {
-        files = files.filter(function (filename) {
+    exports.filter = function(files, includes, excludes, replaceDirectory) {
+        files = files.filter(function(filename) {
             //grunt.verbose.writeln("  testing for files");
             if (includes && exports.isMatched(filename, replaceDirectory, includes)) {
                 if (excludes && exports.isMatched(filename, replaceDirectory, excludes)) {
@@ -163,11 +166,11 @@ module.exports = (function () {
      * Checks whether a file matches the list of patterns specified.
      *
      * @param {string} fp       a path to a file
-     * @param {array}  patterns a list of patterns for files  matching
+     * @param {Object[]} patterns a list of patterns for files matching
      *
      * @return {boolean} "true" if file matches, "false" if file doesnt match.
      */
-    exports.isMatched = function (fp, replaceDirectory, patterns) {
+    exports.isMatched = function(fp, replaceDirectory, patterns) {
         //grunt.verbose.writeln("  checking for match with: " + ip);
         var file = path.resolve(fp).replace(replaceDirectory, "").trim();
         file = exports.normalizeFileName(file);
@@ -177,10 +180,10 @@ module.exports = (function () {
         }
 
         //grunt.verbose.writeln("Matching file:" + fp +" with pattern:" + patterns);
-        return patterns.some(function (ip) {
+        return patterns.some(function(ip) {
             if (minimatch(file, ip, {
-                    nocase: true
-                })) {
+                nocase: true
+            })) {
                 //grunt.verbose.writeln(file + ", Matched::file with regular expression");
                 return true;
             }
@@ -210,15 +213,10 @@ module.exports = (function () {
      * @param  {config} data  Config for checking validity check for a specific folder.  See
      * @return {none}
      */
-    exports.checkThresholdValidityForConfig = function (data, config, homeDirectory, failBuildThreshold) {
+    exports.checkThresholdValidityForConfig = function(data, config, homeDirectory, failBuildThreshold) {
         var src = config.path,
-            lines = config.lines,
-            functions = config.functions,
-            branches = config.branches,
             includes = config.includes,
             excludes = config.excludes,
-            pass = true,
-            length = data.length,
             fileList = [],
             validityResults = {
                 config: null,
@@ -229,9 +227,9 @@ module.exports = (function () {
             };
         validityResults.config = config;
         fileList = exports.collect(src, fileList, includes, excludes, homeDirectory);
-        fileList.forEach(function (filename, index) {
-            var fName = exports.normalizeFileName(filename.replace(homeDirectory, ""));
-            var fileData = data[fName];
+        fileList.forEach(function(filename) {
+            var fName = exports.normalizeFileName(filename.replace(homeDirectory, "")),
+                fileData = data[fName];
 
             if (fileData) {
                 if (fileData.lineThreshold >= config.lines && fileData.branchesThreshold >= config.branches && fileData.functionThreshold >= config.functions) {
@@ -262,11 +260,11 @@ module.exports = (function () {
      * This function checks that the included files satisfies all the configurations that
      * are specified in the configs object.
      *
-     * @param  {Array} data  An array that contains the parsed contents of the lcov file.  See
-     * @param  {Array} data  An array that contains the individual configurations for threshold validity check.  See
+     * @param  {Array} data An array that contains the parsed contents of the lcov file.  See
+     * @param  {Array} data An array that contains the individual configurations for threshold validity check.  See
      * @return {none}
      */
-    exports.checkThresholdValidity = function (data, configs, homeDirectory, logCurrentCoverage, failBuildThreshold) {
+    exports.checkThresholdValidity = function(data, configs, homeDirectory, logCurrentCoverage, failBuildThreshold) {
         //grunt.verbose.writeln("Processing LcovData:" + data);
         var pass = true,
             validityResultsArr = [],
@@ -275,13 +273,13 @@ module.exports = (function () {
             file,
             validityResults;
 
-        configs.forEach(function (config) {
+        configs.forEach(function(config) {
             validityResults = exports.checkThresholdValidityForConfig(data, config, homeDirectory, failBuildThreshold);
             pass = pass && validityResults.isPass;
             validityResultsArr.push(validityResults);
         });
 
-        validityResultsArr.sort(function (result1, result2) {
+        validityResultsArr.sort(function(result1, result2) {
             if (result1.isPass && result2.isPass) {
                 return 0;
             } else if (result1.isPass && !result2.isPass) {
@@ -293,22 +291,20 @@ module.exports = (function () {
             }
         });
 
-        validityResultsArr.forEach(function (validityResults) {
-            var config = validityResults.config,
-                lineCoverage, functionCoverage,
-                branchCoverage, requiredLineCoverage, requiredBranchCoverage, requiredFunctionCoverage;
+        validityResultsArr.forEach(function(validityResults) {
+            var config = validityResults.config;
 
-            validityResults.passedFiles.forEach(function (file) {
+            validityResults.passedFiles.forEach(function(file) {
                 if (!logCurrentCoverage) {
                     printFileInfo(data, file, grunt.log.ok, config, "Passed");
                 } else {
                     printCoverageInfo(data, file);
                 }
             });
-            validityResults.failedFiles.forEach(function (file) {
+            validityResults.failedFiles.forEach(function(file) {
                 failedFiles[file] = config;
             });
-            validityResults.needsAttentionFiles.forEach(function (file) {
+            validityResults.needsAttentionFiles.forEach(function(file) {
                 needsAttentionFiles[file] = config;
             });
         });
@@ -342,18 +338,19 @@ module.exports = (function () {
      * @param  {[type]} file [description]
      * @return {[type]}      [description]
      */
-    var printCoverageInfo = function (data, file) {
-        var lineCoverage = data[file] ? data[file].lineThreshold : 0;
-        var functionCoverage = data[file] ? data[file].functionThreshold : 0;
-        var branchCoverage = data[file] ? data[file].branchesThreshold : 0;
-        var obj = {
-            path: file,
-            lines: lineCoverage,
-            functions: functionCoverage,
-            branches: branchCoverage
-        }
+    var printCoverageInfo = function(data, file) {
+        var lineCoverage = data[file] ? data[file].lineThreshold : 0,
+            functionCoverage = data[file] ? data[file].functionThreshold : 0,
+            branchCoverage = data[file] ? data[file].branchesThreshold : 0,
+            obj = {
+                path: file,
+                lines: lineCoverage,
+                functions: functionCoverage,
+                branches: branchCoverage
+            };
+
         grunt.log.writeln(JSON.stringify(obj) + ",");
-    };
+    },
 
     /**
      * utility function to print the file information
@@ -364,18 +361,18 @@ module.exports = (function () {
      * @param  {[type]} status      [description]
      * @return {[type]}             [description]
      */
-    var printFileInfo = function (data, file, logFunction, config, status) {
-        var lineCoverage = data[file] ? data[file].lineThreshold : 0;
-        var functionCoverage = data[file] ? data[file].functionThreshold : 0;
-        var branchCoverage = data[file] ? data[file].branchesThreshold : 0;
-        var requiredLineCoverage = config.lines;
-        var requiredBranchCoverage = config.branches;
-        var requiredFunctionCoverage = config.functions;
+    printFileInfo = function(data, file, logFunction, config, status) {
+        var lineCoverage = data[file] ? data[file].lineThreshold : 0,
+            functionCoverage = data[file] ? data[file].functionThreshold : 0,
+            branchCoverage = data[file] ? data[file].branchesThreshold : 0,
+            requiredLineCoverage = config.lines,
+            requiredBranchCoverage = config.branches,
+            requiredFunctionCoverage = config.functions;
+
         logFunction(status + ": " + file + " Actual: (" + lineCoverage +
             "L, " + branchCoverage + "B, " + functionCoverage + "F) Expected: (" +
             requiredLineCoverage + "L, " + requiredBranchCoverage + "B, " + requiredFunctionCoverage + "F)");
     };
-
 
     /**
     * This function checks if the src argument is a string,  If yes: then it
@@ -400,7 +397,7 @@ module.exports = (function () {
     * }]
     * for eg. normalizeSrcToObj("./src", 20, 20, 20,["*.js"],["abc.js"]) => [{src:"src",lines:20,functions:20,branches:20, includes:["*.js"], excludes:["abc.js"]}]
     */
-    exports.normalizeSrcToObj = function (src, lines, functions, branches, includes, excludes) {
+    exports.normalizeSrcToObj = function(src, lines, functions, branches, includes, excludes) {
         var configs = [],
             config = {};
         if (typeof (src) === "string") {
@@ -413,14 +410,14 @@ module.exports = (function () {
             configs.push(config);
         } else if (Array.isArray(src)) { //typeof is of array... or has push method
             configs = src;
-            configs.forEach(function (conf) {
-                if (typeof conf.lines === 'undefined') {
+            configs.forEach(function(conf) {
+                if (typeof conf.lines === "undefined") {
                     conf.lines = lines;
                 }
-                if (typeof conf.functions === 'undefined') {
+                if (typeof conf.functions === "undefined") {
                     conf.functions = functions;
                 }
-                if (typeof conf.branches === 'undefined') {
+                if (typeof conf.branches === "undefined") {
                     conf.branches = branches;
                 }
                 if (!conf.includes) {

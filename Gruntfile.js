@@ -1,5 +1,6 @@
 "use strict";
 /* jshint node: true */
+
 module.exports = function(grunt) {
     var path = require("path"),
         banner;
@@ -12,7 +13,6 @@ module.exports = function(grunt) {
 
     require("time-grunt")(grunt);
     //Load our custom tasks
-    //grunt.loadTasks("build-utils/grunt/tasks");
 
     require("load-grunt-config")(grunt, {
         configPath: path.join(process.cwd(), "build-utils/grunt/config"), //path to task.js files, defaults to grunt dir
@@ -27,19 +27,6 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.initConfig({
-        nodeunit: {
-            all: ["test/*-test.js"],
-            options: {
-                reporter: 'verbose'
-            }
-        },
-		debug: {
-			open:true
-		}
-    });
-    grunt.loadNpmTasks('grunt-debug-task');
-    grunt.loadNpmTasks('grunt-contrib-nodeunit');
     // Actually load this plugin's task(s).
     grunt.loadTasks("tasks");
 
@@ -50,7 +37,7 @@ module.exports = function(grunt) {
     grunt.registerTask("documentation", ["jsdoc"]);
 
     // Default task.
-    grunt.registerTask("default", [/*"clean:build"*/, "lint", "documentation"]);
+    grunt.registerTask("default", ["clean:build", "lint", "test", "documentation"]);
 
     grunt.registerTask("test", ["nodeunit"]);
 };
