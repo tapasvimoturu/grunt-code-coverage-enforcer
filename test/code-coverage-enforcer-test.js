@@ -1,23 +1,24 @@
-module.exports = (function (grunt) {
-    "use strict";
+"use strict";
+/* jshint node: true */
+
+module.exports = (function() {
     var util = require("../tasks/lib/code-coverage-enforcer-lib"),
-        assert = require("chai").assert,
         sinon = require("sinon"),
         grunt = require("grunt"),
         filename = process.cwd() + "/test/lcov.info",
         homeDirectory = "/Users/hsomani/githubProjects/zionjs/lib",
         exports = {};
 
-    exports.testNewLcovReader = function (test) {
+    exports.testNewLcovReader = function(test) {
         test.expect(2);
-        util.parseLcov(filename, homeDirectory, function (err, data) {
+        util.parseLcov(filename, homeDirectory, function(err, data) {
             test.ok(!err, "No errors parsing the lcov file.");
-            test.equal(Object.keys(data).length, 23, "The coverage data is found");
+            test.equal(Object.keys(data).length, 24, "The coverage data is found");
             test.done();
         });
     };
 
-    exports.testCheckThresholdValidityWithAllFilesPassed = function (test) {
+    exports.testCheckThresholdValidityWithAllFilesPassed = function(test) {
         var fileList = [
                 "/Users/hsomani/githubProjects/zionjs/lib/configUtil.js",
                 "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
@@ -108,23 +109,28 @@ module.exports = (function (grunt) {
                 "branches": 20
             }];
         test.expect(2);
-        var collectStub = sinon.stub(util, "collect", function (fp, files, includes, excludes, replaceDirectory) {
-            files.push(fp);
-            return files;
-        });
-        var gruntLogOkSpy = sinon.spy(grunt.log, "ok");
+        console.log(fileList);
+        var collectStub = sinon.stub(util, "collect", function(fp, files/*, includes, excludes, replaceDirectory*/) {
+                files.push(fp);
+                return files;
+            }),
+            gruntLogOkSpy = sinon.spy(grunt.log, "ok");
 
-        util.parseLcov(filename, homeDirectory, function (err, data) {
-            var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
-            test.ok(hasPassed, "The coverage check has passed");
-            test.equal(gruntLogOkSpy.callCount, 14, "All files passed");
-            gruntLogOkSpy.restore();
-            collectStub.restore();
-            test.done();
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            if (err) {
+                grunt.fail.fatal("An error occurred while processing the lcov file");
+            } else {
+                var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+                test.ok(hasPassed, "The coverage check has passed");
+                test.equal(gruntLogOkSpy.callCount, 14, "All files passed");
+                gruntLogOkSpy.restore();
+                collectStub.restore();
+                test.done();
+            }
         });
     };
 
-    exports.testCheckThresholdValidityForFailedFiles = function (test) {
+    exports.testCheckThresholdValidityForFailedFiles = function(test) {
         var fileList = [
                 "/Users/hsomani/githubProjects/zionjs/lib/configUtil.js",
                 "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
@@ -215,27 +221,32 @@ module.exports = (function (grunt) {
                 "branches": 20
             }];
         test.expect(4);
-        var collectStub = sinon.stub(util, "collect", function (fp, files, includes, excludes, replaceDirectory) {
-            files.push(fp);
-            return files;
-        });
-        var gruntLogOkSpy = sinon.spy(grunt.log, "ok");
-        var gruntLogWarnSpy = sinon.spy(grunt.log, "warn");
+        console.log(fileList);
+        var collectStub = sinon.stub(util, "collect", function(fp, files/*, includes, excludes, replaceDirectory*/) {
+                files.push(fp);
+                return files;
+            }),
+            gruntLogOkSpy = sinon.spy(grunt.log, "ok"),
+            gruntLogWarnSpy = sinon.spy(grunt.log, "warn");
 
-        util.parseLcov(filename, homeDirectory, function (err, data) {
-            var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
-            test.ok(!hasPassed, "Coverage dropped for files");
-            test.equal(gruntLogOkSpy.callCount, 13, "13 files should pass");
-            test.equal(gruntLogWarnSpy.callCount, 1, "1 file should fail");
-            test.ok(gruntLogWarnSpy.calledWith("Failed: cookieUtil.js Actual: (79.31L, 75B, 66.67F) Expected: (100L, 100B, 100F)"), "Failed files found");
-            gruntLogOkSpy.restore();
-            gruntLogWarnSpy.restore();
-            collectStub.restore();
-            test.done();
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            if (err) {
+                grunt.fail.fatal("An error occurred while processing the lcov file");
+            } else {
+                var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+                test.ok(!hasPassed, "Coverage dropped for files");
+                test.equal(gruntLogOkSpy.callCount, 13, "13 files should pass");
+                test.equal(gruntLogWarnSpy.callCount, 1, "1 file should fail");
+                test.ok(gruntLogWarnSpy.calledWith("Failed: cookieUtil.js Actual: (79.31L, 75B, 66.67F) Expected: (100L, 100B, 100F)"), "Failed files found");
+                gruntLogOkSpy.restore();
+                gruntLogWarnSpy.restore();
+                collectStub.restore();
+                test.done();
+            }
         });
     };
 
-    exports.testCheckThresholdValidityForFailedAndNeedsAttentionFiles = function (test) {
+    exports.testCheckThresholdValidityForFailedAndNeedsAttentionFiles = function(test) {
         var fileList = [
                 "/Users/hsomani/githubProjects/zionjs/lib/configUtil.js",
                 "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
@@ -326,28 +337,33 @@ module.exports = (function (grunt) {
                 "branches": 20
             }];
         test.expect(5);
-        var collectStub = sinon.stub(util, "collect", function (fp, files, includes, excludes, replaceDirectory) {
-            files.push(fp);
-            return files;
-        });
-        var gruntLogOkSpy = sinon.spy(grunt.log, "ok");
-        var gruntLogWarnSpy = sinon.spy(grunt.log, "warn");
+        console.log(fileList);
+        var collectStub = sinon.stub(util, "collect", function(fp, files/*, includes, excludes, replaceDirectory*/) {
+                files.push(fp);
+                return files;
+            }),
+            gruntLogOkSpy = sinon.spy(grunt.log, "ok"),
+            gruntLogWarnSpy = sinon.spy(grunt.log, "warn");
 
-        util.parseLcov(filename, homeDirectory, function (err, data) {
-            var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
-            test.ok(!hasPassed, "Coverage dropped for files");
-            test.equal(gruntLogOkSpy.callCount, 12, "13 files should pass");
-            test.equal(gruntLogWarnSpy.callCount, 2, "2 file should fail");
-            test.ok(gruntLogWarnSpy.calledWith("Needs Attention: cookieUtil.js Actual: (79.31L, 75B, 66.67F) Expected: (78L, 100B, 100F)"), "Needs attention file found");
-            test.ok(gruntLogWarnSpy.calledWith("Failed: HeaderUtil.js Actual: (100L, 75B, 100F) Expected: (90L, 80B, 80F)"), "Failed files found");
-            gruntLogOkSpy.restore();
-            gruntLogWarnSpy.restore();
-            collectStub.restore();
-            test.done();
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            if (err) {
+                grunt.fail.fatal("An error occurred while processing the lcov file");
+            } else {
+                var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+                test.ok(!hasPassed, "Coverage dropped for files");
+                test.equal(gruntLogOkSpy.callCount, 12, "13 files should pass");
+                test.equal(gruntLogWarnSpy.callCount, 2, "2 file should fail");
+                test.ok(gruntLogWarnSpy.calledWith("Needs Attention: cookieUtil.js Actual: (79.31L, 75B, 66.67F) Expected: (78L, 100B, 100F)"), "Needs attention file found");
+                test.ok(gruntLogWarnSpy.calledWith("Failed: HeaderUtil.js Actual: (100L, 75B, 100F) Expected: (90L, 80B, 80F)"), "Failed files found");
+                gruntLogOkSpy.restore();
+                gruntLogWarnSpy.restore();
+                collectStub.restore();
+                test.done();
+            }
         });
     };
 
-    exports.testNormalizeSrcToObjWithNumericOverridesContainingZero = function (test) {
+    exports.testNormalizeSrcToObjWithNumericOverridesContainingZero = function(test) {
         test.expect(1);
         var functions = 20,
             branches = 20,
@@ -371,6 +387,55 @@ module.exports = (function (grunt) {
 
         test.done();
     };
+
+    exports.testMultipleFileExtensionTypes = function(test) {
+        var fileList = [
+               "/Users/hsomani/githubProjects/zionjs/lib/cookieUtil.js",
+                "/Users/hsomani/githubProjects/zionjs/lib/Homepage.jsx"
+            ],
+            failBuildThreshold = 50,
+            configurations = [{
+                "path": "cookieUtil.js",
+                "lines": 50,
+                "functions": 50,
+                "branches": 50,
+                "includes": ["**/*.js", "**/*.jsx"]
+            }, {
+                "path": "Homepage.jsx",
+                "lines": 20,
+                "functions": 20,
+                "branches": 20,
+                "includes": ["**/*.js", "**/*.jsx"]
+            }];
+        test.expect(2);
+        console.log(fileList);
+        var collectStub = sinon.stub(util, "collect", function(file, files, includes) {
+                var extension, extensionRegex;
+                if (includes.some(function(pattern) {
+                        extension = pattern.match(/\.[0-9a-z]+$/)[0];
+                        extensionRegex = "\\" + extension + "$";
+                        return file.match(extensionRegex);
+                    })) {
+                    files.push(file);
+                    return files;
+                }
+            }),
+            gruntLogOkSpy = sinon.spy(grunt.log, "ok");
+
+        util.parseLcov(filename, homeDirectory, function(err, data) {
+            if (err) {
+                grunt.fail.fatal("An error occurred while processing the lcov file");
+            } else {
+                var hasPassed = util.checkThresholdValidity(data, configurations, homeDirectory, false, failBuildThreshold);
+                test.ok(hasPassed, "The coverage check has passed");
+                test.equal(gruntLogOkSpy.callCount, 2, "All files passed");
+                gruntLogOkSpy.restore();
+                collectStub.restore();
+                test.done();
+            }
+        });
+    };
+
     return exports;
 
 }());

@@ -35,7 +35,7 @@
         "grunt-contrib-jshint": "~0.8.0",
         "grunt-contrib-nodeunit": "~0.3.0",
         "grunt-debug-task": "^0.1.7",
-        "grunt-jscs-checker": "0.4.2",
+        "grunt-jscs": "2.8.0",
         "grunt-jsdoc": "0.5.4",
         "intern": "1.6.2",
         "jshint-stylish": "~0.1.5",

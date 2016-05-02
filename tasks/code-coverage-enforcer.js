@@ -1,3 +1,6 @@
+"use strict";
+/* jshint node: true */
+
 /**
  * Copyright 2016 Intuit Inc.
  * All rights reserved.
@@ -25,13 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-var fs = require("fs"),
-    path = require("path"),
-    stringify = require("json-stringify-safe"),
-    shjs = require("shelljs"),
-    util = require("./lib/code-coverage-enforcer-lib"),
-    minimatch = require("minimatch"),
-    grunt = require("grunt");
+var util = require("./lib/code-coverage-enforcer-lib");
 
 /**
  * This is a grunt task that reads a specified Lcov file and checks if the code coverage for the specified files in options meets a
@@ -48,14 +45,14 @@ var fs = require("fs"),
  *          }
  * @author Tapasvi Moturu
  */
-module.exports = function (grunt) {
-    grunt.registerTask("code-coverage-enforcer", "Failing of a build when (lcov) code coverage thresholds are not met", function () {
+module.exports = function(grunt) {
+    grunt.registerTask("code-coverage-enforcer", "Failing of a build when (lcov) code coverage thresholds are not met", function() {
 
-        var done = this.async();
+        var done = this.async(),
 
         /* Initializing the default options.
          */
-        var options = this.options({
+        options = this.options({
             lines: 50,
             functions: 50,
             branches: 0,
@@ -68,7 +65,6 @@ module.exports = function (grunt) {
             failBuild: true,
             failBuildThreshold: 0
         });
-
 
         grunt.verbose.writeln("Checking code coverage for threshold limits ....");
         grunt.verbose.writeln("Reading the lcov file ....");
@@ -84,7 +80,7 @@ module.exports = function (grunt) {
         if (options.lcovfile) {
             grunt.verbose.writeln("Processing File:" + options.lcovfile);
             //Read the lcov file and pass the contents of the file to the anonymous function.
-            util.parseLcov(options.lcovfile, process.cwd(), function (err, lcovJson) {
+            util.parseLcov(options.lcovfile, process.cwd(), function(err, lcovJson) {
                 if (err) {
                     grunt.fail.fatal("An error occurred while processing the lcov file " + options.lcovfile + "");
                 } else {
