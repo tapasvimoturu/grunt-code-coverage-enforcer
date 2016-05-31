@@ -59,7 +59,8 @@ module.exports = function (grunt) {
             lines: 50,
             functions: 50,
             branches: 0,
-            includes: ["**/*.js"],
+            includes: ["**/*.js", "**/*.jsx"],
+            extension: /\.js$|\.jsx$/,
             src: process.cwd(), //array { path: "",thresholds: {} }
             excludes: [],
             logCurrentCoverage: false,
