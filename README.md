@@ -201,6 +201,11 @@ files below 40% whose coverage dropped in the needs attention section and contin
 with existing coverage more than 40%.  Needless to mention that the way the task would know the previous coverage configuration is if you tell this task
 what the existing coverage are by passing the information in 'src' option
 
+#### extension
+Type: `regex`
+Default value: `/\.js$/`
+
+A regular expression used for matching the file extensions of source files that are to be included.
 
 
 ### Usage Examples

@@ -59,7 +59,8 @@ module.exports = function (grunt) {
             lines: 50,
             functions: 50,
             branches: 0,
-            includes: ["**/*.js"],
+            includes: ["**/*.js", "**/*.jsx"],
+            extension: /\.js$|\.jsx$/,
             src: process.cwd(), //array { path: "",thresholds: {} }
             excludes: [],
             logCurrentCoverage: false,
@@ -78,7 +79,7 @@ module.exports = function (grunt) {
         options.excludes = util.normalizeOSPath(options.excludes);
 
         //Adapt the original options to the list of configs that will be used for validating the code coverage.
-        options.src = util.normalizeSrcToObj(options.src, options.lines, options.functions, options.branches, options.includes, options.excludes, options.filter);
+        options.src = util.normalizeSrcToObj(options.src, options.lines, options.functions, options.branches, options.includes, options.excludes, options.extension);
         // options.src = util.normalizeOSPath(options.src);
 
         if (options.lcovfile) {
