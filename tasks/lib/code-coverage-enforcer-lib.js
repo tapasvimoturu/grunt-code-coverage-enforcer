@@ -73,6 +73,7 @@ module.exports = (function () {
         lcovParse(lcovFile, function (err, data) {
             var retData = {};
             if (!data) {
+                cb(err, retData);
                 return retData;
             }
 
