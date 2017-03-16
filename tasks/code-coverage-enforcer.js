@@ -87,7 +87,7 @@ module.exports = function (grunt) {
             //Read the lcov file and pass the contents of the file to the anonymous function.
             util.parseLcov(options.lcovfile, process.cwd(), function (err, lcovJson) {
                 if (err) {
-                    grunt.fail.fatal("An error occurred while processing the lcov file " + options.lcovfile + "");
+                    grunt.fail.fatal("An error occurred while processing the lcov file " + options.lcovfile + ": Are you sure you have tests ?");
                 } else {
 
                     //Check the threshold validity using the lcovJson with all the passed in configs
