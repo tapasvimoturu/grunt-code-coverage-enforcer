@@ -362,10 +362,13 @@ module.exports = (function (grunt) {
                 includes: ["/**.js", "/**.js"],
                 excludes: ["/**.js", "/**.js"]
             }],
-            expectedValue = JSON.stringify(testValue),
+            expectedValue,
             returnValue;
 
         returnValue = util.normalizeSrcToObj(testValue, lines, functions, branches, includes, excludes);
+
+        testValue[0].path = util.normalizeFileName(testValue[0].path);
+        expectedValue = JSON.stringify(testValue),
 
         test.strictEqual(JSON.stringify(returnValue), expectedValue, "Overrides provided in the config should be respected even if numeric values are 0.");
 

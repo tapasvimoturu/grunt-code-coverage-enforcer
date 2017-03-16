@@ -44,9 +44,11 @@ module.exports = (function () {
 
     /*
      * This method is a decorator used to normalize the file names that are created by LCOV reporters. For ex. Intern's default LCOV reporter
-     * has the filename when it is in the current folder but Karma add as ./ in front of the file
+     * has the filename when it is in the current folder but Karma add as ./ in front of the file.
+     * Also normalize the paths within the "filename" to consistently use Unix style path separators.
      */
     exports.normalizeFileName = function (filename) {
+        filename = exports.normalizeOSPath(filename);
         if (filename.substring(0, 2) === "./") {
             filename = filename.substring(2);
         } else if (filename.substring(0, 1) === "/") {
@@ -88,17 +90,14 @@ module.exports = (function () {
         });
     };
 
-    //normalizing all path properties.
+    //normalizing all path properties to Unix style.
     exports.normalizeOSPath = function (fp) {
         var arr = [],
             normalizeFile = function (f) {
                 if (path.sep === "\\") {
-                    //Current Machine is windows style
-                    f = f.replace(/\//g, "\\");
-                } else {
-                    //Current Machine is unix style
+                    // Current machine is Windows style.
+                    // Normalize to Unix style, as rest of this library expects that.
                     f = f.replace(/\\/g, "/");
-
                 }
                 return f;
             };
