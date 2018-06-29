@@ -108,7 +108,7 @@ module.exports = (function (grunt) {
                 "branches": 20
             }];
         test.expect(2);
-        var collectStub = sinon.stub(util, "collect", function (fp, files, includes, excludes, replaceDirectory) {
+        var collectStub = sinon.stub(util, "collect").callsFake(function (fp, files, includes, excludes, replaceDirectory) {
             files.push(fp);
             return files;
         });
@@ -215,7 +215,7 @@ module.exports = (function (grunt) {
                 "branches": 20
             }];
         test.expect(4);
-        var collectStub = sinon.stub(util, "collect", function (fp, files, includes, excludes, replaceDirectory) {
+        var collectStub = sinon.stub(util, "collect").callsFake(function (fp, files, includes, excludes, replaceDirectory) {
             files.push(fp);
             return files;
         });
@@ -326,7 +326,7 @@ module.exports = (function (grunt) {
                 "branches": 20
             }];
         test.expect(5);
-        var collectStub = sinon.stub(util, "collect", function (fp, files, includes, excludes, replaceDirectory) {
+        var collectStub = sinon.stub(util, "collect").callsFake(function (fp, files, includes, excludes, replaceDirectory) {
             files.push(fp);
             return files;
         });
